@@ -1,0 +1,21 @@
+﻿@{
+    Layout = null;
+}
+<div class="card-panel">
+    <h5 class="center blue-text">B-Serve: Resident Registration</h5>
+    <div class="row">
+        <div class="input-field col s6"><input type="text" ng-model="FName"><label>First Name</label></div>
+        <div class="input-field col s6"><input type="text" ng-model="LName"><label>Last Name</label></div>
+        <div class="input-field col s12"><input type="text" ng-model="Purok"><label>Purok / Street Address</label></div>
+        <div class="input-field col s6"><input type="text" ng-model="RegUsername"><label>Username</label></div>
+        <div class="input-field col s6"><input type="password" ng-model="RegPassword"><label>Password</label></div>
+        <div class="input-field col s6"><input type="text" ng-model="ContactNum"><label>Contact Number</label></div>
+        <div class="input-field col s6"><input type="text" ng-model="ResidentID"><label>Resident ID</label></div>
+    </div>
+    <div class="center">
+        <button class="btn blue" ng-click="saveUser()" ng-disabled="!isFormValid()">SAVE</button>
+        <button class="btn green" ng-show="showLogin" ng-click="goTo('LoginPage')">LOGIN</button>
+        <button class="btn grey" ng-click="goTo('LoginPage')">BACK</button>
+    </div>
+</div>
+</div>

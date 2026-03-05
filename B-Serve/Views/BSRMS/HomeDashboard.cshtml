@@ -1,0 +1,31 @@
+﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="container">
+    <h3 class="center blue-text font-bold">B-Serve Dashboard</h3>
+
+    <div class="row" style="margin-top:40px;">
+        <div class="col s12 m4">
+            <div class="card-panel center hoverable">
+                <i class="material-icons large blue-text">assignment</i>
+                <h5>Request Document</h5>
+                <button class="btn blue" ng-click="goTo('RequestPage')">SELECT</button>
+            </div>
+        </div>
+
+        <div class="col s12 m4">
+            <div class="card-panel center hoverable">
+                <i class="material-icons large green-text">remove_red_eye</i>
+                <h5>Monitor Request</h5>
+                <button class="btn green" ng-click="goTo('UsersPage')">CHECK</button>
+            </div>
+        </div>
+
+        <div class="col s12 m4">
+            <div class="card-panel center hoverable">
+                <i class="material-icons large red-text">exit_to_app</i>
+                <h5>Logout</h5>
+                <button class="btn red" ng-click="goTo('LoginPage')">EXIT</button>
+            </div>
+        </div>
+    </div>
+</div>
