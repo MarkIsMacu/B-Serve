@@ -28,5 +28,24 @@ namespace B_Serve.Controllers
         {
             return View();
         }
+
+        public ActionResult AdminApproval()
+        {
+            return View();
+        }
+        public ActionResult AdminRequest()
+        {
+            return View();
+        }
+
+        public ActionResult AdminUsers()
+        {
+            return View();
+        }
+
+        public ActionResult ResidentDashboard()
+        {
+            return View();
+        }
     }
 }

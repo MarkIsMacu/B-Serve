@@ -1,20 +1,38 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="row center-align" style="margin-top:100px;">
-    <div class="col s12 m4 offset-m4 card-panel z-depth-2" style="padding: 20px; border-radius: 10px;">
-        <h4 class="blue-text text-darken-4">B-Serve Login</h4>
-        <p>Barangay Service Request & Monitoring</p>
-        <div class="input-field col s12">
-            <i class="material-icons prefix">person</i>
-            <input type="text" ng-model="LoginUser">
-            <label>Username</label>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-100 text-brand-600 mb-4">
+                <i class="material-icons text-4xl">admin_panel_settings</i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900">B-Serve Portal</h2>
+            <p class="mt-2 text-sm text-gray-500">Barangay Service Request & Monitoring</p>
         </div>
-        <div class="input-field col s12">
-            <i class="material-icons prefix">lock</i>
-            <input type="password" ng-model="LoginPass">
-            <label>Password</label>
+
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" ng-model="LoginUser" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" placeholder="Enter your username">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" ng-model="LoginPass" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" placeholder="••••••••">
+            </div>
+
+            <button ng-click="login()" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-brand-600 hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all">
+                <i class="material-icons mr-2 text-sm">login</i> SECURE LOGIN
+            </button>
         </div>
-        <button class="btn-large blue darken-4" style="width:100%" ng-click="login()">LOGIN</button>
-        <p>New Resident? <a href="#" ng-click="goTo('Registration')">Register Account</a></p>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">
+                New resident?
+                <a href="#" ng-click="goTo('Registration')" class="font-bold text-brand-600 hover:text-brand-800 hover:underline">Register your account</a>
+            </p>
+        </div>
+
     </div>
 </div>

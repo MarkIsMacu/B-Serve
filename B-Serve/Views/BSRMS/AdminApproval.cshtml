@@ -1,0 +1,60 @@
+﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Pending Registrations</h2>
+            <p class="text-gray-500">Review and verify new barangay residents.</p>
+        </div>
+        <button ng-click="goTo('HomeDashboard')" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors">
+            Back to Dashboard
+        </button>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Address</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Account</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr ng-repeat="user in userArray | filter:{Role:'Resident', Status:'Pending'}" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-gray-900">{{user.FirstName}} {{user.MiddleName}} {{user.LastName}}</div>
+                            <div class="text-sm text-gray-500">{{user.Gender}}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{user.Contact}}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title="{{user.FullAddress}}">
+                            {{user.FullAddress}}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{user.Username}}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                                {{user.Status}}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium">
+                            <button ng-click="verifyUser(user)" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1 rounded-md mr-2 transition-colors">Verify</button>
+                            <button ng-click="rejectUser(user)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors">Reject</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-show="(userArray | filter:{Role:'Resident', Status:'Pending'}).length == 0" class="text-center py-12">
+            <i class="material-icons text-gray-300 text-5xl mb-2">task_alt</i>
+            <h3 class="text-lg font-medium text-gray-900">All caught up!</h3>
+            <p class="text-gray-500">There are no pending registrations waiting for verification.</p>
+        </div>
+    </div>
+
+</div>

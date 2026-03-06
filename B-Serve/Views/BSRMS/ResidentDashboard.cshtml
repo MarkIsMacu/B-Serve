@@ -1,0 +1,79 @@
+﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8" ng-init="loadMyRequests()">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <i class="material-icons text-brand-600 mr-3 text-4xl">domain</i> Resident Hub
+            </h1>
+            <p class="text-gray-500 mt-1">Submit and track your barangay documents and complaints</p>
+        </div>
+        <button ng-click="goTo('Login')" class="mt-4 md:mt-0 flex items-center px-5 py-2.5 bg-red-50 text-red-600 font-bold rounded-full hover:bg-red-100 border border-red-200 transition-colors">
+            <i class="material-icons mr-2 text-sm">exit_to_app</i> SIGN OUT
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center border-b pb-3">
+                    <i class="material-icons text-brand-500 mr-2">create</i> New Submission
+                </h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Select Category</label>
+                        <select ng-model="ReqType" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 bg-gray-50 focus:bg-white outline-none transition-colors">
+                            <option value="" disabled selected>-- Choose Request Type --</option>
+                            <option value="Document Request">Document Request (Clearance, ID)</option>
+                            <option value="Complaint">Community Complaint</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Message / Details</label>
+                        <textarea ng-model="ReqMessage" placeholder="Provide specific details here..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 bg-gray-50 focus:bg-white outline-none min-h-[120px] transition-colors"></textarea>
+                    </div>
+
+                    <button ng-click="submitRequest()" ng-disabled="!ReqType || !ReqMessage" class="w-full flex justify-center items-center py-3.5 px-4 rounded-xl font-bold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all mt-2">
+                        <i class="material-icons mr-2 text-sm">send</i> SUBMIT TO BARANGAY
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-7">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center border-b pb-3">
+                    <i class="material-icons text-brand-500 mr-2">history</i> My Request History
+                </h3>
+
+                <div class="overflow-y-auto max-h-[500px] pr-2">
+                    <div ng-repeat="req in myRequests" class="bg-gray-50 rounded-xl p-5 mb-4 border border-gray-100 relative hover:shadow-md transition-shadow">
+
+                        <div class="absolute top-4 right-4">
+                            <span ng-show="req.Status == 'Pending'" class="px-3 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-200">Pending</span>
+                            <span ng-show="req.Status == 'On-going'" class="px-3 py-1 text-xs font-bold rounded-full bg-brand-100 text-brand-800 border border-brand-200">On-going</span>
+                            <span ng-show="req.Status == 'Resolved'" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Resolved</span>
+                        </div>
+
+                        <div class="text-xs font-bold text-brand-600 uppercase tracking-wide mb-1">{{req.Type}}</div>
+                        <p class="text-gray-700 mt-2 pr-20">{{req.Message}}</p>
+                    </div>
+
+                    <div ng-show="myRequests.length == 0" class="text-center py-16">
+                        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gray-100 mb-4">
+                            <i class="material-icons text-gray-400 text-4xl">inbox</i>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-800">No requests found</h4>
+                        <p class="text-gray-500">You haven't submitted any documents or complaints yet.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

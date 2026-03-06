@@ -972,6 +972,10 @@
     <Content Include="Views\BSRMS\HomeDashboard.cshtml" />
     <Content Include="Views\Shared\_BSRMSLayout.cshtml" />
     <Content Include="Scripts\version.json" />
+    <Content Include="Views\BSRMS\AdminApproval.cshtml" />
+    <Content Include="Views\BSRMS\AdminRequest.cshtml" />
+    <Content Include="Views\BSRMS\ResidentDashboard.cshtml" />
+    <Content Include="Views\BSRMS\AdminUsers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

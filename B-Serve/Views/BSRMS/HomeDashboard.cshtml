@@ -1,15 +1,98 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="row center-align" style="margin-top:80px;">
-    <div class="col s12">
-        <h2 class="blue-text text-darken-4">B-SERVE DASHBOARD</h2>
-        <h6 class="grey-text">Monitoring System Control Panel</h6>
-        <div class="divider"></div>
-        <br>
-        <div class="row">
-            <div class="col s12 m4"><a class="btn-large blue darken-2" style="width:100%" ng-click="goTo('Login')"><i class="material-icons left">login</i>LOGIN</a></div>
-            <div class="col s12 m4"><a class="btn-large green darken-2" style="width:100%" ng-click="goTo('Registration')"><i class="material-icons left">person_add</i>REGISTER</a></div>
-            <div class="col s12 m4"><a class="btn-large orange darken-3" style="width:100%" ng-click="goTo('Users')"><i class="material-icons left">groups</i>RESIDENTS</a></div>
+<div class="flex h-screen bg-gray-50 font-sans">
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl hidden md:flex">
+
+        <div class="h-20 flex items-center px-6 border-b border-gray-800">
+            <i class="material-icons text-brand-500 mr-3 text-3xl">admin_panel_settings</i>
+            <span class="text-xl font-bold tracking-wider">B-SERVE</span>
         </div>
-    </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-3">
+            <a href="#" class="flex items-center px-4 py-3 bg-brand-600 text-white rounded-xl transition-colors">
+                <i class="material-icons mr-3">dashboard</i> Dashboard
+            </a>
+
+            <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
+                <i class="material-icons mr-3">how_to_reg</i> Pending Approvals
+            </a>
+
+            <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
+                <i class="material-icons mr-3">people</i> Verified Residents
+            </a>
+
+            <a href="#" ng-click="goTo('AdminRequest')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
+                <i class="material-icons mr-3">assignment</i> Manage Requests
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800">
+            <button ng-click="goTo('Login')" class="flex items-center w-full px-4 py-3 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-colors font-bold">
+                <i class="material-icons mr-3">logout</i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+
+        <header class="h-20 bg-white flex items-center justify-between px-8 border-b border-gray-200 z-10">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Admin Overview</h2>
+                <p class="text-sm text-gray-500">Welcome back to the B-Serve Control Panel.</p>
+            </div>
+
+            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
+                <div class="h-8 w-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold mr-3">A</div>
+                <span class="font-bold text-gray-700 text-sm">System Admin</span>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8">
+
+            <h3 class="text-lg font-bold text-gray-800 mb-4">System Analytics</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div ng-click="goTo('AdminUsers')" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition-shadow relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 h-32 w-32 bg-emerald-50 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
+
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 font-bold text-sm mb-1">Total Verified Residents</p>
+                            <h2 class="text-5xl font-extrabold text-gray-800">{{ getTotalVerifiedResidents() }}</h2>
+                        </div>
+                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl shadow-sm">
+                            <i class="material-icons text-3xl">groups</i>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-6 flex items-center text-emerald-600 text-sm font-bold">
+                        <span>Manage directory</span>
+                        <i class="material-icons text-sm ml-1">chevron_right</i>
+                    </div>
+                </div>
+
+                <div ng-click="goTo('AdminRequest')" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition-shadow relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 h-32 w-32 bg-brand-50 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
+
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 font-bold text-sm mb-1">Total Request Reports</p>
+                            <h2 class="text-5xl font-extrabold text-gray-800">{{ requestArray.length }}</h2>
+                        </div>
+                        <div class="p-3 bg-brand-100 text-brand-600 rounded-xl shadow-sm">
+                            <i class="material-icons text-3xl">assignment_turned_in</i>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-6 flex items-center text-brand-600 text-sm font-bold">
+                        <span>View all details</span>
+                        <i class="material-icons text-sm ml-1">chevron_right</i>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
 </div>
