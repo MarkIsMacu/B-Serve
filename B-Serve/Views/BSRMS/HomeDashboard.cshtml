@@ -1,31 +1,15 @@
-﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="container">
-    <h3 class="center blue-text font-bold">B-Serve Dashboard</h3>
-
-    <div class="row" style="margin-top:40px;">
-        <div class="col s12 m4">
-            <div class="card-panel center hoverable">
-                <i class="material-icons large blue-text">assignment</i>
-                <h5>Request Document</h5>
-                <button class="btn blue" ng-click="goTo('RequestPage')">SELECT</button>
-            </div>
-        </div>
-
-        <div class="col s12 m4">
-            <div class="card-panel center hoverable">
-                <i class="material-icons large green-text">remove_red_eye</i>
-                <h5>Monitor Request</h5>
-                <button class="btn green" ng-click="goTo('UsersPage')">CHECK</button>
-            </div>
-        </div>
-
-        <div class="col s12 m4">
-            <div class="card-panel center hoverable">
-                <i class="material-icons large red-text">exit_to_app</i>
-                <h5>Logout</h5>
-                <button class="btn red" ng-click="goTo('LoginPage')">EXIT</button>
-            </div>
+<div class="row center-align" style="margin-top:80px;">
+    <div class="col s12">
+        <h2 class="blue-text text-darken-4">B-SERVE DASHBOARD</h2>
+        <h6 class="grey-text">Monitoring System Control Panel</h6>
+        <div class="divider"></div>
+        <br>
+        <div class="row">
+            <div class="col s12 m4"><a class="btn-large blue darken-2" style="width:100%" ng-click="goTo('Login')"><i class="material-icons left">login</i>LOGIN</a></div>
+            <div class="col s12 m4"><a class="btn-large green darken-2" style="width:100%" ng-click="goTo('Registration')"><i class="material-icons left">person_add</i>REGISTER</a></div>
+            <div class="col s12 m4"><a class="btn-large orange darken-3" style="width:100%" ng-click="goTo('Users')"><i class="material-icons left">groups</i>RESIDENTS</a></div>
         </div>
     </div>
 </div>

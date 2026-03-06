@@ -1,1 +1,1 @@
-﻿var app = angular.module("BSRMS", []);
+﻿var app = angular.module("BSRMSApp", []);

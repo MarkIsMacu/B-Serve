@@ -1,11 +1,20 @@
-﻿@{ Layout = "~/Views/Shared/_Layout.cshtml"; }
+﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
 <div class="row center-align" style="margin-top:100px;">
-    <div class="col s12 m4 offset-m4 card-panel">
-        <h4 class="blue-text">B-Serve Login</h4>
-        <div class="input-field col s12"><input type="text" ng-model="LoginUser"><label>Username</label></div>
-        <div class="input-field col s12"><input type="password" ng-model="LoginPass"><label>Password</label></div>
-        <button class="btn-large blue" style="width:100%" ng-click="login()">LOGIN</button>
-        <p>New here? <a href="#" ng-click="goTo('RegistrationPage')">Register</a></p>
+    <div class="col s12 m4 offset-m4 card-panel z-depth-2" style="padding: 20px; border-radius: 10px;">
+        <h4 class="blue-text text-darken-4">B-Serve Login</h4>
+        <p>Barangay Service Request & Monitoring</p>
+        <div class="input-field col s12">
+            <i class="material-icons prefix">person</i>
+            <input type="text" ng-model="LoginUser">
+            <label>Username</label>
+        </div>
+        <div class="input-field col s12">
+            <i class="material-icons prefix">lock</i>
+            <input type="password" ng-model="LoginPass">
+            <label>Password</label>
+        </div>
+        <button class="btn-large blue darken-4" style="width:100%" ng-click="login()">LOGIN</button>
+        <p>New Resident? <a href="#" ng-click="goTo('Registration')">Register Account</a></p>
     </div>
 </div>

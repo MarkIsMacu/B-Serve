@@ -1,21 +1,21 @@
-﻿@{
-    Layout = null;
-}
-<div class="card-panel">
-    <h5 class="center blue-text">B-Serve: Resident Registration</h5>
-    <div class="row">
-        <div class="input-field col s6"><input type="text" ng-model="FName"><label>First Name</label></div>
-        <div class="input-field col s6"><input type="text" ng-model="LName"><label>Last Name</label></div>
-        <div class="input-field col s12"><input type="text" ng-model="Purok"><label>Purok / Street Address</label></div>
-        <div class="input-field col s6"><input type="text" ng-model="RegUsername"><label>Username</label></div>
-        <div class="input-field col s6"><input type="password" ng-model="RegPassword"><label>Password</label></div>
-        <div class="input-field col s6"><input type="text" ng-model="ContactNum"><label>Contact Number</label></div>
-        <div class="input-field col s6"><input type="text" ng-model="ResidentID"><label>Resident ID</label></div>
+﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+
+<div class="container" style="margin-top:50px;">
+    <div class="card-panel z-depth-3" style="border-radius: 15px;">
+        <h5 class="center blue-text text-darken-4">Resident Registration</h5>
+        <div class="row">
+            <div class="input-field col s12 m4"><input type="text" ng-model="FName"><label>First Name</label></div>
+            <div class="input-field col s12 m4"><input type="text" ng-model="MName"><label>Middle Name</label></div>
+            <div class="input-field col s12 m4"><input type="text" ng-model="LName"><label>Last Name</label></div>
+            <div class="input-field col s12 m6"><input type="text" ng-model="RegUsername"><label>Username</label></div>
+            <div class="input-field col s12 m6"><input type="password" ng-model="RegPassword"><label>Password</label></div>
+            <div class="input-field col s12 m6"><input type="tel" ng-model="TPhone"><label>Telephone/Mobile</label></div>
+            <div class="input-field col s12 m6"><input type="text" ng-model="HAddress"><label>Home Address</label></div>
+        </div>
+        <div class="center">
+            <button class="btn green darken-1" ng-click="saveUser()" ng-disabled="!isFormValid()">REGISTER</button>
+            <button class="btn blue darken-3" ng-show="showLogin" ng-click="goTo('Login')">GO TO LOGIN</button>
+            <button class="btn red lighten-1" ng-click="deleteData()">CLEAR FORM</button>
+        </div>
     </div>
-    <div class="center">
-        <button class="btn blue" ng-click="saveUser()" ng-disabled="!isFormValid()">SAVE</button>
-        <button class="btn green" ng-show="showLogin" ng-click="goTo('LoginPage')">LOGIN</button>
-        <button class="btn grey" ng-click="goTo('LoginPage')">BACK</button>
-    </div>
-</div>
 </div>
