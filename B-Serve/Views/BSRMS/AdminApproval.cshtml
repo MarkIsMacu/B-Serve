@@ -1,60 +1,74 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+<div class="flex h-screen bg-gray-50 font-sans overflow-hidden">
 
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900">Pending Registrations</h2>
-            <p class="text-gray-500">Review and verify new barangay residents.</p>
+    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-2xl hidden md:flex z-20">
+        <div class="h-20 flex items-center px-6 border-b border-gray-800 bg-gray-950">
+            <i class="material-icons text-brand-500 mr-3 text-3xl">admin_panel_settings</i><span class="text-xl font-bold tracking-wider">B-SERVE</span>
         </div>
-        <button ng-click="goTo('HomeDashboard')" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors">
-            Back to Dashboard
-        </button>
-    </div>
+        <nav class="flex-1 px-4 py-6 space-y-3">
+            <a href="#" ng-click="goTo('HomeDashboard')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">dashboard</i> Dashboard</a>
 
-    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Address</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Account</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr ng-repeat="user in userArray | filter:{Role:'Resident', Status:'Pending'}" class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-gray-900">{{user.FirstName}} {{user.MiddleName}} {{user.LastName}}</div>
-                            <div class="text-sm text-gray-500">{{user.Gender}}</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{user.Contact}}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title="{{user.FullAddress}}">
-                            {{user.FullAddress}}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{user.Username}}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
-                                {{user.Status}}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium">
-                            <button ng-click="verifyUser(user)" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1 rounded-md mr-2 transition-colors">Verify</button>
-                            <button ng-click="rejectUser(user)" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors">Reject</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <a href="#" class="flex items-center px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg shadow-brand-500/30 transition-all"><i class="material-icons mr-3">how_to_reg</i> Pending Approvals</a>
+
+            <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">people</i> Verified Residents</a>
+            <a href="#" ng-click="goTo('AdminRequest')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">assignment</i> Manage Requests</a>
+        </nav>
+        <div class="p-4 border-t border-gray-800 bg-gray-950">
+            <button ng-click="goTo('Login')" class="flex items-center w-full px-4 py-3 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all font-bold group"><i class="material-icons mr-3 group-hover:-translate-x-1 transition-transform">logout</i> Sign Out</button>
         </div>
+    </aside>
 
-        <div ng-show="(userArray | filter:{Role:'Resident', Status:'Pending'}).length == 0" class="text-center py-12">
-            <i class="material-icons text-gray-300 text-5xl mb-2">task_alt</i>
-            <h3 class="text-lg font-medium text-gray-900">All caught up!</h3>
-            <p class="text-gray-500">There are no pending registrations waiting for verification.</p>
+    <main class="flex-1 flex flex-col relative animate-slide-up">
+        <header class="h-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 border-b border-gray-200 z-10 sticky top-0">
+            <div><h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">Pending Registrations</h2><p class="text-sm text-gray-500">Review and verify new barangay residents.</p></div>
+            <div class="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm"><div class="h-8 w-8 rounded-full bg-gradient-to-tr from-brand-600 to-brand-400 text-white flex items-center justify-center font-bold mr-3">A</div><span class="font-bold text-gray-700 text-sm">System Admin</span></div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Applicant Name</th>
+                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Contact & Info</th>
+                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Barangay Address</th>
+                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Requested User</th>
+                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-white">
+                            <tr ng-repeat="user in userArray | filter:{Role:'Resident', Status:'Pending'}" class="hover:bg-brand-50/50 transition-colors duration-200">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 flex-shrink-0 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold mr-4">{{user.FirstName.charAt(0)}}</div>
+                                        <div>
+                                            <div class="font-bold text-gray-900 text-base">{{user.FirstName}} {{user.MiddleName}} {{user.LastName}}</div>
+                                            <span class="px-2 py-1 inline-flex text-[10px] leading-tight font-bold rounded-full bg-amber-100 text-amber-800 uppercase mt-1">Pending Review</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5"><div class="text-sm font-bold text-gray-900">{{user.Contact}}</div><div class="text-xs text-gray-500 mt-1">{{user.Gender}}</div></td>
+                                <td class="px-6 py-5 text-sm text-gray-600 max-w-xs truncate">{{user.FullAddress}}</td>
+                                <td class="px-6 py-5"><div class="text-sm font-mono bg-gray-100 px-2 py-1 rounded inline-block text-gray-800">{{user.Username}}</div></td>
+                                <td class="px-6 py-5">
+                                    <div class="flex gap-2">
+                                        <button ng-click="verifyUser(user)" class="flex items-center px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-500 hover:text-white hover:shadow-lg hover:shadow-emerald-500/30 rounded-lg font-bold text-sm transition-all group"><i class="material-icons text-sm mr-1 group-hover:scale-110 transition-transform">check_circle</i> Verify</button>
+                                        <button ng-click="rejectUser(user)" class="flex items-center px-4 py-2 bg-red-50 text-red-700 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30 rounded-lg font-bold text-sm transition-all group"><i class="material-icons text-sm mr-1 group-hover:scale-110 transition-transform">cancel</i> Reject</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div ng-show="(userArray | filter:{Role:'Resident', Status:'Pending'}).length == 0" class="text-center py-20 bg-gray-50/50">
+                    <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-emerald-100 text-emerald-600 mb-6 shadow-inner"><i class="material-icons text-5xl">task_alt</i></div>
+                    <h3 class="text-2xl font-black text-gray-800 mb-2">You're all caught up!</h3>
+                    <p class="text-gray-500 font-medium">There are no pending registrations waiting for verification right now.</p>
+                </div>
+            </div>
         </div>
-    </div>
-
+    </main>
 </div>

@@ -1,79 +1,93 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8" ng-init="loadMyRequests()">
+<div class="min-h-screen bg-gray-50 font-sans relative flex flex-col" ng-init="loadMyRequests()">
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                <i class="material-icons text-brand-600 mr-3 text-4xl">domain</i> Resident Hub
-            </h1>
-            <p class="text-gray-500 mt-1">Submit and track your barangay documents and complaints</p>
-        </div>
-        <button ng-click="goTo('Login')" class="mt-4 md:mt-0 flex items-center px-5 py-2.5 bg-red-50 text-red-600 font-bold rounded-full hover:bg-red-100 border border-red-200 transition-colors">
-            <i class="material-icons mr-2 text-sm">exit_to_app</i> SIGN OUT
-        </button>
+    <div class="absolute top-0 left-0 w-full h-80 bg-gradient-to-b from-brand-900 to-brand-700 z-0">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="relative z-10 max-w-7xl mx-auto w-full py-10 px-4 sm:px-6 lg:px-8 animate-slide-up flex-1 flex flex-col">
 
-        <div class="lg:col-span-5">
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center border-b pb-3">
-                    <i class="material-icons text-brand-500 mr-2">create</i> New Submission
-                </h3>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Select Category</label>
-                        <select ng-model="ReqType" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 bg-gray-50 focus:bg-white outline-none transition-colors">
-                            <option value="" disabled selected>-- Choose Request Type --</option>
-                            <option value="Document Request">Document Request (Clearance, ID)</option>
-                            <option value="Complaint">Community Complaint</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Message / Details</label>
-                        <textarea ng-model="ReqMessage" placeholder="Provide specific details here..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 bg-gray-50 focus:bg-white outline-none min-h-[120px] transition-colors"></textarea>
-                    </div>
-
-                    <button ng-click="submitRequest()" ng-disabled="!ReqType || !ReqMessage" class="w-full flex justify-center items-center py-3.5 px-4 rounded-xl font-bold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all mt-2">
-                        <i class="material-icons mr-2 text-sm">send</i> SUBMIT TO BARANGAY
-                    </button>
-                </div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-white/20 pb-6">
+            <div>
+                <h1 class="text-4xl font-black text-white flex items-center tracking-tight drop-shadow-md">
+                    <i class="material-icons mr-4 text-5xl opacity-90">assured_workload</i> Resident Hub
+                </h1>
+                <p class="text-brand-100 mt-2 font-medium text-lg">Submit documents and track your barangay requests.</p>
             </div>
+            <button ng-click="goTo('Login')" class="mt-6 md:mt-0 flex items-center px-6 py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white hover:text-brand-900 border border-white/30 backdrop-blur-md transition-all duration-300 shadow-lg">
+                <i class="material-icons mr-2">power_settings_new</i> SECURE LOGOUT
+            </button>
         </div>
 
-        <div class="lg:col-span-7">
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center border-b pb-3">
-                    <i class="material-icons text-brand-500 mr-2">history</i> My Request History
-                </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
 
-                <div class="overflow-y-auto max-h-[500px] pr-2">
-                    <div ng-repeat="req in myRequests" class="bg-gray-50 rounded-xl p-5 mb-4 border border-gray-100 relative hover:shadow-md transition-shadow">
+            <div class="lg:col-span-5">
+                <div class="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-8 border border-gray-100 transform transition-all hover:-translate-y-1">
+                    <h3 class="text-2xl font-black text-gray-900 mb-8 flex items-center">
+                        <span class="bg-gradient-to-br from-brand-500 to-indigo-600 text-white p-3 rounded-xl mr-4 shadow-md"><i class="material-icons block">draw</i></span>
+                        New Submission
+                    </h3>
 
-                        <div class="absolute top-4 right-4">
-                            <span ng-show="req.Status == 'Pending'" class="px-3 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-200">Pending</span>
-                            <span ng-show="req.Status == 'On-going'" class="px-3 py-1 text-xs font-bold rounded-full bg-brand-100 text-brand-800 border border-brand-200">On-going</span>
-                            <span ng-show="req.Status == 'Resolved'" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Resolved</span>
+                    <div class="space-y-6">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 group-focus-within:text-brand-600 transition-colors">Select Category</label>
+                            <select ng-model="ReqType" class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:ring-0 focus:border-brand-500 bg-gray-50 focus:bg-white outline-none transition-all cursor-pointer font-medium text-gray-700">
+                                <option value="" disabled selected>-- Choose Request Type --</option>
+                                <option value="Document Request">Document Request (Clearance, ID)</option>
+                                <option value="Complaint">Community Complaint</option>
+                            </select>
                         </div>
 
-                        <div class="text-xs font-bold text-brand-600 uppercase tracking-wide mb-1">{{req.Type}}</div>
-                        <p class="text-gray-700 mt-2 pr-20">{{req.Message}}</p>
-                    </div>
-
-                    <div ng-show="myRequests.length == 0" class="text-center py-16">
-                        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-gray-100 mb-4">
-                            <i class="material-icons text-gray-400 text-4xl">inbox</i>
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 group-focus-within:text-brand-600 transition-colors">Message / Details (Max 500 characters)</label>
+                            <textarea ng-model="ReqMessage" maxlength="500" placeholder="Provide specific details here..." class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:ring-0 focus:border-brand-500 bg-gray-50 focus:bg-white outline-none min-h-[160px] transition-all resize-none font-medium text-gray-700"></textarea>
                         </div>
-                        <h4 class="text-lg font-bold text-gray-800">No requests found</h4>
-                        <p class="text-gray-500">You haven't submitted any documents or complaints yet.</p>
+
+                        <button ng-click="submitRequest()" ng-disabled="!ReqType || !ReqMessage" class="w-full flex justify-center items-center py-4 px-4 rounded-xl font-black text-white bg-brand-600 hover:bg-brand-500 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none shadow-lg shadow-brand-500/30 transform hover:-translate-y-1 transition-all duration-300 mt-6 tracking-wide">
+                            <i class="material-icons mr-2">send</i> SUBMIT TO BARANGAY
+                        </button>
                     </div>
                 </div>
-
             </div>
+
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-8 border border-gray-100 h-full">
+                    <h3 class="text-2xl font-black text-gray-900 mb-8 flex items-center">
+                        <span class="bg-gradient-to-br from-emerald-400 to-teal-500 text-white p-3 rounded-xl mr-4 shadow-md"><i class="material-icons block">dynamic_feed</i></span>
+                        My Request Timeline
+                    </h3>
+
+                    <div class="overflow-y-auto max-h-[550px] pr-4 space-y-5 custom-scrollbar">
+                        <div ng-repeat="req in myRequests" class="bg-gray-50 rounded-2xl p-6 border-l-4 border-l-brand-500 border-y border-r border-gray-100 relative hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group">
+                            <div class="absolute top-6 right-6">
+                                <span ng-show="req.Status == 'Pending'" class="px-4 py-1.5 text-xs font-black rounded-full bg-amber-100 text-amber-800 shadow-sm border border-amber-200 flex items-center"><i class="material-icons text-[14px] mr-1">schedule</i> Pending</span>
+                                <span ng-show="req.Status == 'On-going'" class="px-4 py-1.5 text-xs font-black rounded-full bg-brand-100 text-brand-800 shadow-sm border border-brand-200 flex items-center"><i class="material-icons text-[14px] mr-1">autorenew</i> On-going</span>
+                                <span ng-show="req.Status == 'Resolved'" class="px-4 py-1.5 text-xs font-black rounded-full bg-emerald-100 text-emerald-800 shadow-sm border border-emerald-200 flex items-center"><i class="material-icons text-[14px] mr-1">check_circle</i> Resolved</span>
+                            </div>
+
+                            <div class="flex items-center text-xs font-black text-brand-600 uppercase tracking-widest mb-3 bg-brand-50 inline-block px-3 py-1 rounded-md">
+                                {{req.Type}}
+                            </div>
+                            <p class="text-gray-700 mt-2 pr-28 leading-relaxed font-medium text-lg">{{req.Message}}</p>
+                        </div>
+
+                        <div ng-show="myRequests.length == 0" class="text-center py-24 animate-fade-in bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                            <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-white shadow-sm mb-6 text-gray-300">
+                                <i class="material-icons text-6xl">inventory_2</i>
+                            </div>
+                            <h4 class="text-2xl font-black text-gray-800 mb-2">No active submissions</h4>
+                            <p class="text-gray-500 font-medium">Your document requests and complaints will be tracked here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <footer class="mt-auto border-t border-gray-200/60 pt-8 text-center">
+            <p class="text-[12px] text-gray-500 font-bold uppercase tracking-widest">© 2026 B-Serve Resident Portal. System protected & encrypted.</p>
+        </footer>
 
     </div>
 </div>

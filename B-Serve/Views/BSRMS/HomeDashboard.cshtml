@@ -1,97 +1,91 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="flex h-screen bg-gray-50 font-sans">
+<div class="flex h-screen bg-[#f8fafc] font-sans overflow-hidden">
 
-    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl hidden md:flex">
+    <aside class="w-72 bg-gradient-to-b from-brand-900 to-gray-900 text-white flex flex-col shadow-2xl hidden md:flex z-20 relative">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
 
-        <div class="h-20 flex items-center px-6 border-b border-gray-800">
-            <i class="material-icons text-brand-500 mr-3 text-3xl">admin_panel_settings</i>
-            <span class="text-xl font-bold tracking-wider">B-SERVE</span>
+        <div class="h-24 flex items-center px-8 border-b border-white/10 relative z-10">
+            <div class="h-12 w-12 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm mr-4 shadow-inner">
+                <i class="material-icons text-white text-3xl">admin_panel_settings</i>
+            </div>
+            <div>
+                <span class="block text-xl font-black tracking-widest">B-SERVE</span>
+                <span class="block text-[10px] text-brand-300 uppercase tracking-wider font-bold">Command Center</span>
+            </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-3">
-            <a href="#" class="flex items-center px-4 py-3 bg-brand-600 text-white rounded-xl transition-colors">
-                <i class="material-icons mr-3">dashboard</i> Dashboard
-            </a>
-
-            <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
-                <i class="material-icons mr-3">how_to_reg</i> Pending Approvals
-            </a>
-
-            <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
-                <i class="material-icons mr-3">people</i> Verified Residents
-            </a>
-
-            <a href="#" ng-click="goTo('AdminRequest')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
-                <i class="material-icons mr-3">assignment</i> Manage Requests
-            </a>
+        <nav class="flex-1 px-5 py-8 space-y-3 relative z-10">
+            <a href="#" class="flex items-center px-4 py-3.5 bg-white/10 text-white rounded-xl shadow-lg border border-white/10 backdrop-blur-sm transition-all"><i class="material-icons mr-4 text-brand-300">dashboard</i> <span class="font-bold tracking-wide">Dashboard</span></a>
+            <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3.5 text-gray-300 hover:bg-white/5 hover:text-white rounded-xl transition-all hover:translate-x-2"><i class="material-icons mr-4 opacity-70">how_to_reg</i> <span class="font-medium tracking-wide">Pending Approvals</span></a>
+            <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3.5 text-gray-300 hover:bg-white/5 hover:text-white rounded-xl transition-all hover:translate-x-2"><i class="material-icons mr-4 opacity-70">people</i> <span class="font-medium tracking-wide">Verified Residents</span></a>
+            <a href="#" ng-click="goTo('AdminRequest')" class="flex items-center px-4 py-3.5 text-gray-300 hover:bg-white/5 hover:text-white rounded-xl transition-all hover:translate-x-2"><i class="material-icons mr-4 opacity-70">assignment</i> <span class="font-medium tracking-wide">Manage Requests</span></a>
         </nav>
 
-        <div class="p-4 border-t border-gray-800">
-            <button ng-click="goTo('Login')" class="flex items-center w-full px-4 py-3 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-colors font-bold">
-                <i class="material-icons mr-3">logout</i> Sign Out
+        <div class="p-6 relative z-10">
+            <button ng-click="goTo('Login')" class="flex items-center justify-center w-full px-4 py-4 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 rounded-xl transition-all font-bold group shadow-sm">
+                <i class="material-icons mr-2 group-hover:-translate-x-1 transition-transform">logout</i> SIGN OUT
             </button>
         </div>
     </aside>
 
+    <main class="flex-1 flex flex-col relative animate-slide-up overflow-y-auto">
+        <div class="pt-12 px-10 pb-8 flex-1 flex flex-col">
 
-    <main class="flex-1 flex flex-col overflow-hidden relative">
-
-        <header class="h-20 bg-white flex items-center justify-between px-8 border-b border-gray-200 z-10">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800">Admin Overview</h2>
-                <p class="text-sm text-gray-500">Welcome back to the B-Serve Control Panel.</p>
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-2">System Overview</h1>
+                    <p class="text-gray-500 font-medium">Here is what is happening in your barangay today.</p>
+                </div>
+                <div class="flex items-center bg-white border border-gray-200 rounded-full pl-2 pr-5 py-2 shadow-sm">
+                    <div class="h-10 w-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-black mr-3"><i class="material-icons">shield</i></div>
+                    <div class="flex flex-col"><span class="font-bold text-gray-800 text-sm leading-tight">System Admin</span><span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Active Session</span></div>
+                </div>
             </div>
 
-            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
-                <div class="h-8 w-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold mr-3">A</div>
-                <span class="font-bold text-gray-700 text-sm">System Admin</span>
-            </div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-8">
-
-            <h3 class="text-lg font-bold text-gray-800 mb-4">System Analytics</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div ng-click="goTo('AdminUsers')" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition-shadow relative overflow-hidden group">
-                    <div class="absolute -right-6 -top-6 h-32 w-32 bg-emerald-50 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 font-bold text-sm mb-1">Total Verified Residents</p>
-                            <h2 class="text-5xl font-extrabold text-gray-800">{{ getTotalVerifiedResidents() }}</h2>
-                        </div>
-                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl shadow-sm">
-                            <i class="material-icons text-3xl">groups</i>
-                        </div>
+            <div class="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl p-1 mb-10 shadow-xl shadow-orange-500/20 transform hover:-translate-y-1 transition-all duration-300">
+                <div class="bg-white/10 backdrop-blur-md rounded-[1.4rem] p-6 flex flex-col md:flex-row justify-between items-center h-full w-full">
+                    <div class="mb-4 md:mb-0 flex items-center">
+                        <div class="h-14 w-14 bg-white/20 rounded-full flex items-center justify-center mr-5 shadow-inner"><i class="material-icons text-white text-3xl animate-bounce">notifications_active</i></div>
+                        <div><h3 class="text-xl font-black text-white mb-1 tracking-wide">Verification Required</h3><p class="text-amber-50 font-medium">New residents are waiting for your approval to access the system.</p></div>
                     </div>
-                    <div class="relative z-10 mt-6 flex items-center text-emerald-600 text-sm font-bold">
-                        <span>Manage directory</span>
-                        <i class="material-icons text-sm ml-1">chevron_right</i>
+                    <button ng-click="goTo('AdminApproval')" class="px-8 py-4 bg-white text-orange-600 font-black rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all flex items-center tracking-wide">
+                        REVIEW NOW <i class="material-icons ml-2">arrow_forward</i>
+                    </button>
+                </div>
+            </div>
+
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-5">Live System Analytics</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div ng-click="goTo('AdminUsers')" class="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20 cursor-pointer transform hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 h-48 w-48 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-700 ease-out opacity-50"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="p-4 bg-emerald-50 text-emerald-600 rounded-2xl shadow-inner border border-emerald-100 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300"><i class="material-icons text-4xl">how_to_reg</i></div>
+                            <span class="flex items-center text-xs font-bold text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full"><i class="material-icons text-[12px] mr-1">trending_up</i> Live Data</span>
+                        </div>
+                        <h2 class="text-7xl font-black text-gray-800 tracking-tighter mb-2">{{ getTotalVerifiedResidents() }}</h2>
+                        <p class="text-gray-500 font-bold text-sm uppercase tracking-widest">Total Verified Residents</p>
                     </div>
                 </div>
 
-                <div ng-click="goTo('AdminRequest')" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md cursor-pointer transition-shadow relative overflow-hidden group">
-                    <div class="absolute -right-6 -top-6 h-32 w-32 bg-brand-50 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 font-bold text-sm mb-1">Total Request Reports</p>
-                            <h2 class="text-5xl font-extrabold text-gray-800">{{ requestArray.length }}</h2>
+                <div ng-click="goTo('AdminRequest')" class="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-brand-500/20 cursor-pointer transform hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 h-48 w-48 bg-gradient-to-br from-brand-100 to-brand-50 rounded-full group-hover:scale-150 transition-transform duration-700 ease-out opacity-50"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="p-4 bg-brand-50 text-brand-600 rounded-2xl shadow-inner border border-brand-100 group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300"><i class="material-icons text-4xl">folder_shared</i></div>
+                            <span class="flex items-center text-xs font-bold text-brand-500 bg-brand-50 px-3 py-1 rounded-full"><i class="material-icons text-[12px] mr-1">update</i> Real-time</span>
                         </div>
-                        <div class="p-3 bg-brand-100 text-brand-600 rounded-xl shadow-sm">
-                            <i class="material-icons text-3xl">assignment_turned_in</i>
-                        </div>
-                    </div>
-                    <div class="relative z-10 mt-6 flex items-center text-brand-600 text-sm font-bold">
-                        <span>View all details</span>
-                        <i class="material-icons text-sm ml-1">chevron_right</i>
+                        <h2 class="text-7xl font-black text-gray-800 tracking-tighter mb-2">{{ requestArray.length }}</h2>
+                        <p class="text-gray-500 font-bold text-sm uppercase tracking-widest">Total Request Reports</p>
                     </div>
                 </div>
-
             </div>
+
+            <footer class="mt-auto pt-8 border-t border-gray-200 text-center">
+                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">© 2026 B-Serve Admin Command Center. Data Securely Encrypted.</p>
+            </footer>
 
         </div>
     </main>

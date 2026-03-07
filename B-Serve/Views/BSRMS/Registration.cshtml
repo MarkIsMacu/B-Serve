@@ -1,38 +1,45 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="min-h-screen py-10 px-4">
-    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative">
 
-        <div class="text-center mb-10 border-b pb-6">
-            <h2 class="text-3xl font-bold text-gray-900">Resident Registration</h2>
-            <p class="mt-2 text-gray-500">Please provide accurate details for barangay verification.</p>
+    <header class="absolute top-0 left-0 w-full px-8 py-6 flex justify-between items-center z-20">
+        <div class="flex items-center text-brand-900 font-black text-2xl tracking-widest drop-shadow-sm">
+            <i class="material-icons mr-2 text-brand-600">admin_panel_settings</i> B-SERVE
+        </div>
+        <button ng-click="goTo('Login')" class="text-sm font-bold text-gray-500 hover:text-brand-600 transition-colors flex items-center">
+            <i class="material-icons mr-1 text-[16px]">arrow_back</i> Return to Login
+        </button>
+    </header>
+
+    <div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl p-10 border border-gray-100 animate-slide-up relative overflow-hidden my-8">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-brand-50 opacity-50 blur-3xl"></div>
+
+        <div class="text-center mb-12 relative z-10 border-b border-gray-100 pb-8">
+            <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-brand-100 text-brand-600 mb-5 shadow-inner">
+                <i class="material-icons text-5xl">person_add_alt_1</i>
+            </div>
+            <h2 class="text-4xl font-black text-gray-900 tracking-tight">Resident Registration</h2>
+            <p class="mt-3 text-gray-500 font-medium">Please provide accurate details for barangay verification.</p>
         </div>
 
-        <div class="space-y-8">
-            <div>
-                <h3 class="text-lg font-bold text-brand-600 mb-4 flex items-center">
-                    <i class="material-icons mr-2">person</i> Personal Information
+        <div class="space-y-10 relative z-10">
+            <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-xl font-bold text-brand-700 mb-5 flex items-center">
+                    <span class="bg-brand-100 p-2 rounded-lg mr-3"><i class="material-icons block text-sm">badge</i></span> Personal Details
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input type="text" ng-model="FName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                        <input type="text" ng-model="MName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input type="text" ng-model="LName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">First Name</label><input type="text" ng-model="FName" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">Middle Name</label><input type="text" ng-model="MName" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">Last Name</label><input type="text" ng-model="LName" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
+
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                        <input type="text" ng-model="Contact" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Contact Number (11 Digits)</label>
+                        <input type="text" ng-model="Contact" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="09xxxxxxxxx" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-mono">
                     </div>
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                        <select ng-model="Gender" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Gender</label>
+                        <select ng-model="Gender" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all bg-white cursor-pointer">
                             <option value="" disabled selected>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -41,51 +48,45 @@
                 </div>
             </div>
 
-            <div>
-                <h3 class="text-lg font-bold text-brand-600 mb-4 flex items-center">
-                    <i class="material-icons mr-2">home</i> Barangay Address
+            <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-xl font-bold text-brand-700 mb-5 flex items-center">
+                    <span class="bg-brand-100 p-2 rounded-lg mr-3"><i class="material-icons block text-sm">home</i></span> Barangay Address
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">House / Block / Lot</label>
-                        <input type="text" ng-model="BlkLot" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Name</label>
-                        <input type="text" ng-model="Street" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Purok / Sitio</label>
-                        <input type="text" ng-model="Purok" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
-                    </div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">House / Block / Lot</label><input type="text" ng-model="BlkLot" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">Street Name</label><input type="text" ng-model="Street" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-2">Purok / Sitio</label><input type="text" ng-model="Purok" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"></div>
                 </div>
             </div>
 
-            <div>
-                <h3 class="text-lg font-bold text-brand-600 mb-4 flex items-center">
-                    <i class="material-icons mr-2">lock</i> Account Details
+            <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+                <h3 class="text-xl font-bold text-brand-700 mb-5 flex items-center">
+                    <span class="bg-brand-100 p-2 rounded-lg mr-3"><i class="material-icons block text-sm">lock</i></span> Account Credentials
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <input type="text" ng-model="RegUsername" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Username (Max 15 chars)</label>
+                        <input type="text" ng-model="RegUsername" maxlength="15" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" ng-model="RegPassword" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Password (Max 20 chars)</label>
+                        <input type="password" ng-model="RegPassword" maxlength="20" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <button ng-click="saveUser()" ng-disabled="!isFormValid()" class="px-8 py-3 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all">
-                SUBMIT REGISTRATION
+        <div class="mt-12 flex flex-col sm:flex-row gap-5 justify-center relative z-10 border-t border-gray-100 pt-8">
+            <button ng-click="saveUser()" ng-disabled="!isFormValid()" class="px-10 py-4 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/30 disabled:shadow-none transform hover:-translate-y-1 disabled:transform-none transition-all duration-300 flex items-center justify-center">
+                <i class="material-icons mr-2">how_to_reg</i> SUBMIT REGISTRATION
             </button>
-            <button ng-click="goTo('Login')" class="px-8 py-3 rounded-lg font-bold text-gray-700 bg-gray-200 hover:bg-gray-300 shadow-sm transition-all">
-                BACK TO LOGIN
+            <button ng-click="goTo('Login')" class="px-10 py-4 rounded-xl font-bold text-gray-700 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all flex items-center justify-center">
+                <i class="material-icons mr-2">arrow_back</i> BACK TO LOGIN
             </button>
         </div>
-
     </div>
+
+    <footer class="absolute bottom-0 w-full py-6 text-center z-20">
+        <p class="text-sm text-gray-400 font-bold tracking-wide">© 2026 B-Serve Barangay Portal. All rights reserved.</p>
+    </footer>
 </div>
