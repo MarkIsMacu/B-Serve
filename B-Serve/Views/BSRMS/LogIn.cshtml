@@ -1,42 +1,70 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="min-h-screen relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-brand-900 to-indigo-900">
+<div class="min-h-screen flex font-sans selection:bg-indigo-500/30 overflow-hidden bg-white">
 
-    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-500 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-500 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
+    <div class="hidden lg:flex lg:w-1/2 relative bg-[#09090b] flex-col justify-between p-12 overflow-hidden border-r border-slate-800">
+        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-violet-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute top-[30%] left-[30%] w-[400px] h-[400px] bg-cyan-500/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse" style="animation-delay: 4s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay pointer-events-none"></div>
 
-    <div class="max-w-md w-full mx-4 relative z-10 bg-white/10 backdrop-blur-xl rounded-[2rem] shadow-2xl p-10 border border-white/20 animate-slide-up">
-
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center h-20 w-20 rounded-2xl bg-white/20 text-white mb-6 shadow-inner border border-white/30 backdrop-blur-md transform hover:scale-110 transition-transform duration-500">
-                <i class="material-icons text-5xl">admin_panel_settings</i>
-            </div>
-            <h2 class="text-4xl font-black text-white tracking-tight drop-shadow-md">B-Serve</h2>
-            <p class="mt-2 text-brand-100 font-medium tracking-wide">Barangay Service Portal</p>
+        <div class="relative z-10 flex items-center">
+            <div class="h-12 w-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center mr-4 border border-white/20 shadow-lg"><i class="material-icons text-white text-[24px]">admin_panel_settings</i></div>
+            <span class="text-2xl font-black text-white tracking-widest uppercase">B-Serve</span>
         </div>
 
-        <div class="space-y-6">
-            <div class="group relative">
-                <label class="block text-xs font-bold text-brand-100 uppercase tracking-wider mb-2">Username</label>
-                <input type="text" ng-model="LoginUser" maxlength="15" class="w-full px-5 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:bg-white/20 focus:border-white/50 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300 backdrop-blur-sm" placeholder="Enter username">
-            </div>
-
-            <div class="group relative">
-                <label class="block text-xs font-bold text-brand-100 uppercase tracking-wider mb-2">Password</label>
-                <input type="password" ng-model="LoginPass" maxlength="15" class="w-full px-5 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:bg-white/20 focus:border-white/50 focus:ring-4 focus:ring-white/10 outline-none transition-all duration-300 backdrop-blur-sm" placeholder="••••••••">
-            </div>
-
-            <button ng-click="login()" class="w-full flex justify-center items-center py-4 px-4 rounded-xl font-black text-brand-900 bg-white hover:bg-brand-50 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:-translate-y-1 transition-all duration-300 mt-4">
-                SECURE LOGIN <i class="material-icons ml-2 text-sm">arrow_forward</i>
-            </button>
-        </div>
-
-        <div class="mt-8 text-center pt-6 border-t border-white/10">
-            <p class="text-sm text-brand-100">
-                New resident?
-                <a href="#" ng-click="goTo('Registration')" class="font-bold text-white hover:text-brand-200 hover:underline transition-colors decoration-2 underline-offset-4">Create an account</a>
+        <div class="relative z-10 my-auto">
+            <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-indigo-100 to-slate-400 tracking-tighter leading-[1.1] mb-6">
+                Next-Gen<br>Community<br>Services.
+            </h1>
+            <p class="text-lg text-indigo-200/80 font-medium max-w-md leading-relaxed">
+                Experience a seamless, fast, and secure way to process your barangay documents and administrative requests.
             </p>
         </div>
 
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-500 tracking-widest uppercase">© 2026 Tech-Sikap Initiative</p>
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative">
+        <div class="max-w-md w-full animate-slide-up">
+
+            <div class="lg:hidden mb-12 text-center">
+                <div class="h-16 w-16 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-500/30"><i class="material-icons text-white text-3xl">admin_panel_settings</i></div>
+                <h2 class="text-3xl font-black text-slate-900 tracking-tight">B-Serve</h2>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Welcome back</h2>
+                <p class="text-slate-500 font-medium">Please enter your credentials to securely access your account.</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="group">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Username <span class="text-rose-500">*</span></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="material-icons text-slate-400 text-[20px] group-focus-within:text-indigo-600 transition-colors">person_outline</i></div>
+                        <input type="text" ng-model="LoginUser" maxlength="15" class="w-full pl-14 pr-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-300 font-bold" placeholder="Enter username">
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Password <span class="text-rose-500">*</span></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none"><i class="material-icons text-slate-400 text-[20px] group-focus-within:text-indigo-600 transition-colors">lock_outline</i></div>
+                        <input type="password" ng-model="LoginPass" maxlength="20" class="w-full pl-14 pr-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-300 font-bold" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button ng-click="login()" class="w-full mt-4 py-4 rounded-2xl font-black text-white bg-slate-900 hover:bg-indigo-600 shadow-xl shadow-slate-900/10 hover:shadow-indigo-500/30 transition-all duration-300 active:scale-[0.98] flex items-center justify-center group tracking-widest uppercase">
+                    Authenticate <i class="material-icons ml-3 text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</i>
+                </button>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-sm text-slate-500 font-bold">Don't have an account? <a href="#" ng-click="goTo('Registration')" class="font-black text-indigo-600 hover:text-indigo-800 transition-colors underline decoration-2 underline-offset-4">Register here</a></p>
+            </div>
+        </div>
     </div>
 </div>

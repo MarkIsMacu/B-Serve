@@ -1,109 +1,109 @@
 ﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
-<div class="flex h-screen bg-gray-50 font-sans overflow-hidden">
+<div class="flex h-screen bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30 relative">
+    <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none"></div>
 
-    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-2xl hidden md:flex z-20">
-        <div class="h-20 flex items-center px-6 border-b border-gray-800 bg-gray-950"><i class="material-icons text-brand-500 mr-3 text-3xl">admin_panel_settings</i><span class="text-xl font-bold tracking-wider">B-SERVE</span></div>
-        <nav class="flex-1 px-4 py-6 space-y-3">
-            <a href="#" ng-click="goTo('HomeDashboard')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">dashboard</i> Dashboard</a>
-            <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">how_to_reg</i> Pending Approvals</a>
-            <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-all hover:translate-x-1"><i class="material-icons mr-3">people</i> Verified Residents</a>
-
-            <a href="#" class="flex items-center px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg shadow-brand-500/30 transition-all"><i class="material-icons mr-3">assignment</i> Manage Requests</a>
-        </nav>
-        <div class="p-4 border-t border-gray-800 bg-gray-950"><button ng-click="goTo('Login')" class="flex items-center w-full px-4 py-3 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all font-bold group"><i class="material-icons mr-3 group-hover:-translate-x-1 transition-transform">logout</i> Sign Out</button></div>
+    <aside class="w-[280px] bg-[#09090b] text-white flex flex-col hidden md:flex z-20 relative border-r border-slate-800">
+        <div class="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-indigo-600/30 rounded-full mix-blend-screen filter blur-[80px] pointer-events-none"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+        <div class="h-24 flex items-center px-8 border-b border-white/10 relative z-10"><div class="h-10 w-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 rounded-xl flex items-center justify-center mr-3 shadow-lg ring-2 ring-white/20"><i class="material-icons text-white text-[20px]">holiday_village</i></div><span class="text-xl font-black tracking-widest uppercase">B-SERVE</span></div>
+        <div class="px-6 py-8 relative z-10">
+            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 pl-1">Administration</p>
+            <nav class="space-y-2">
+                <a href="#" ng-click="goTo('HomeDashboard')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">dashboard</i> Dashboard</a>
+                <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">how_to_reg</i> Approvals</a>
+                <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">people</i> Directory</a>
+                <a href="#" class="flex items-center px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25"><i class="material-icons mr-3 text-white text-[20px]">assignment</i> Requests</a>
+            </nav>
+        </div>
+        <div class="mt-auto p-6 relative z-10 border-t border-white/10"><button ng-click="goTo('LogIn')" class="flex items-center justify-center w-full px-4 py-3 bg-white/5 text-slate-300 hover:text-white hover:bg-rose-500/80 rounded-2xl font-bold transition-all"><i class="material-icons mr-2 text-[20px]">logout</i> Sign Out</button></div>
     </aside>
 
-    <main class="flex-1 flex flex-col relative animate-slide-up">
-
-        <header class="h-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 border-b border-gray-200 z-10 sticky top-0">
-            <div><h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">Request Tracking Board</h2><p class="text-sm text-gray-500">Update statuses for resident documents and complaints.</p></div>
-            <button ng-click="openAddReqForm()" ng-hide="showReqForm" class="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg shadow-gray-900/30 hover:bg-gray-800 hover:-translate-y-0.5 transition-all flex items-center">
-                <i class="material-icons mr-2 text-sm">add_circle</i> Log Manual Request
-            </button>
+    <main class="flex-1 flex flex-col relative animate-slide-up overflow-y-auto z-10">
+        <header class="h-24 bg-white/60 backdrop-blur-2xl border-b border-white sticky top-0 z-30 flex items-center justify-between px-10 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
+            <div><h1 class="text-2xl font-black text-slate-900 tracking-tight">Request Board</h1></div>
+            <button ng-click="openAddReqForm()" ng-hide="showReqForm" class="flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 text-sm font-black rounded-2xl px-6 py-3 transition-all shadow-lg shadow-indigo-500/20 active:scale-95 tracking-wide"><i class="material-icons mr-2 text-[20px]">add_task</i> Log Manual Entry</button>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8">
+        <div class="p-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
 
-            <div ng-show="showReqForm" class="bg-white rounded-2xl shadow-2xl border border-gray-200 p-8 mb-8 relative overflow-hidden animate-slide-up">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-400 to-indigo-500"></div>
-                <h3 class="text-2xl font-black text-gray-800 mb-8 flex items-center border-b border-gray-100 pb-4 mt-2">
-                    <span class="bg-indigo-50 text-indigo-600 p-2 rounded-lg mr-3 shadow-inner border border-indigo-100"><i class="material-icons block">edit_document</i></span>
-                    {{ reqEditMode ? 'Update Request Status' : 'Create Manual Request' }}
-                </h3>
+            <div ng-show="showReqForm" class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.08)] p-10 mb-8 relative overflow-hidden animate-slide-up">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500"></div>
+                <h3 class="text-2xl font-black text-slate-900 mb-8 flex items-center border-b border-slate-200/60 pb-6"><div class="p-2 bg-indigo-50 rounded-xl mr-4 border border-indigo-100 shadow-sm"><i class="material-icons text-indigo-600 block">edit_document</i></div> {{ reqEditMode ? 'Update Service Ticket' : 'Create Internal Ticket' }}</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Category Type</label>
-                        <select ng-model="tempReq.Type" class="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 bg-gray-50 focus:bg-white outline-none transition-all cursor-pointer">
-                            <option value="" disabled selected>Select Category Type</option>
-                            <option value="Document Request">Document Request</option>
-                            <option value="Complaint">Complaint</option>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-rose-500">*</span></label>
+                        <select ng-model="tempReq.Type" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
+                            <option value="" disabled selected>Select</option>
+                            <option value="Barangay Clearance">Barangay Clearance</option>
+                            <option value="Certificate of Indigency">Certificate of Indigency</option>
+                            <option value="Business Permit">Business Permit</option>
+                            <option value="General Complaint">General Complaint</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Current Status Update</label>
-                        <select ng-model="tempReq.Status" class="w-full px-4 py-3.5 rounded-xl border border-gray-300 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 bg-gray-50 focus:bg-white outline-none transition-all cursor-pointer">
-                            <option value="Pending">Pending (Awaiting Review)</option>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Assign Status <span class="text-rose-500">*</span></label>
+                        <select ng-model="tempReq.Status" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
+                            <option value="Pending">Pending (Review)</option>
                             <option value="On-going">On-going (Processing)</option>
-                            <option value="Resolved">Resolved (Completed)</option>
+                            <option value="Resolved">Resolved (Complete)</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Message / Detailed Request</label>
-                        <textarea ng-model="tempReq.Message" class="w-full px-4 py-4 rounded-xl border border-gray-300 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 bg-gray-50 focus:bg-white outline-none min-h-[120px] transition-all resize-none"></textarea>
-                    </div>
+
+                    <div class="md:col-span-1"><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-rose-500">*</span></label><textarea ng-model="tempReq.Message" maxlength="500" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none shadow-sm"></textarea></div>
+                    <div class="md:col-span-1"><label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2 pl-1"><i class="material-icons text-[12px] align-baseline mr-1">chat</i> Admin Note to Resident</label><textarea ng-model="tempReq.AdminFeedback" maxlength="500" placeholder="Reply to the resident directly..." class="w-full px-5 py-4 rounded-2xl bg-indigo-50/30 border-2 border-indigo-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none placeholder-slate-400 shadow-sm"></textarea></div>
                 </div>
 
                 <div class="flex gap-4">
-                    <button ng-click="adminSaveRequest()" class="px-8 py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-500 transform hover:-translate-y-1 transition-all">SAVE UPDATE</button>
-                    <button ng-click="showReqForm = false" class="px-8 py-3.5 bg-white text-gray-700 font-bold rounded-xl border-2 border-gray-200 hover:bg-gray-50 transition-all">CANCEL</button>
+                    <button ng-click="adminSaveRequest()" class="px-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-indigo-600 text-xs transition-all active:scale-95 border border-slate-800">Save Update</button>
+                    <button ng-click="showReqForm = false" class="px-8 py-4 bg-white text-slate-500 border-2 border-slate-100 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-50 hover:text-slate-700 text-xs transition-all active:scale-95 shadow-sm">Cancel</button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div class="inline-flex bg-white/60 backdrop-blur-md p-1.5 rounded-[1.2rem] mb-8 self-start border border-white shadow-[0_4px_20px_rgb(0,0,0,0.04)]" ng-init="setReqFilter('')">
+                <button ng-click="setReqFilter('')" ng-class="{'bg-white shadow-md text-slate-900': currentReqFilter == '', 'text-slate-400 hover:text-slate-700': currentReqFilter != ''}" class="px-6 py-2.5 rounded-xl font-black text-xs transition-all tracking-wide uppercase">All</button>
+                <button ng-click="setReqFilter('Pending')" ng-class="{'bg-white shadow-md text-slate-900': currentReqFilter == 'Pending', 'text-slate-400 hover:text-slate-700': currentReqFilter != 'Pending'}" class="px-6 py-2.5 rounded-xl font-black text-xs transition-all tracking-wide uppercase">Pending</button>
+                <button ng-click="setReqFilter('On-going')" ng-class="{'bg-white shadow-md text-slate-900': currentReqFilter == 'On-going', 'text-slate-400 hover:text-slate-700': currentReqFilter != 'On-going'}" class="px-6 py-2.5 rounded-xl font-black text-xs transition-all tracking-wide uppercase">On-going</button>
+                <button ng-click="setReqFilter('Resolved')" ng-class="{'bg-white shadow-md text-slate-900': currentReqFilter == 'Resolved', 'text-slate-400 hover:text-slate-700': currentReqFilter != 'Resolved'}" class="px-6 py-2.5 rounded-xl font-black text-xs transition-all tracking-wide uppercase">Resolved</button>
+            </div>
+
+            <div class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] overflow-hidden mb-8">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Requested By</th>
-                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Submission Details</th>
-                                <th class="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Current Status</th>
-                                <th class="px-6 py-4 text-right text-xs font-black text-gray-500 uppercase tracking-wider pr-8">Manage</th>
-                            </tr>
+                    <table class="min-w-full text-left">
+                        <thead class="bg-white/50 border-b border-slate-100">
+                            <tr><th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Resident</th><th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Submission Data</th><th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">State</th><th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th></tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 bg-white">
-                            <tr ng-repeat="req in requestArray" class="hover:bg-gray-50/80 transition-colors duration-200 group">
-                                <td class="px-6 py-5">
-                                    <div class="flex items-center">
-                                        <i class="material-icons text-gray-400 mr-3 text-3xl">account_circle</i>
-                                        <span class="font-bold text-gray-900">{{req.Sender}}</span>
-                                    </div>
+                        <tbody class="divide-y divide-slate-100/50">
+                            <tr ng-repeat="req in requestArray track by $index" ng-show="currentReqFilter === '' || req.Status === currentReqFilter" class="hover:bg-white/50 transition-colors group">
+                                <td class="px-8 py-6"><div class="flex items-center"><div class="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center font-black text-sm mr-4 shadow-sm">{{req.Sender.charAt(0)}}</div><span class="font-black text-slate-900 text-sm">{{req.Sender}}</span></div></td>
+                                <td class="px-8 py-6">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 mb-2 text-[9px] font-black uppercase tracking-widest shadow-sm">{{req.Type}}</span>
+                                    <div class="text-sm text-slate-700 font-bold leading-relaxed max-w-lg">{{req.Message}}</div>
+                                    <div ng-show="req.AdminFeedback" class="mt-3 text-[11px] font-bold text-indigo-700 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100"><i class="material-icons text-[12px] align-baseline mr-1 text-indigo-500">forum</i> Admin Reply: {{req.AdminFeedback}}</div>
                                 </td>
-                                <td class="px-6 py-5">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200 mb-2 uppercase tracking-wide"><i class="material-icons text-[12px] mr-1">sell</i>{{req.Type}}</span>
-                                    <div class="text-sm text-gray-700 max-w-md pr-10 leading-relaxed">{{req.Message}}</div>
+                                <td class="px-8 py-6">
+                                    <span ng-show="req.Status == 'Pending'" class="px-3 py-1.5 text-[9px] font-black rounded-md bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest shadow-sm">Pending</span>
+                                    <span ng-show="req.Status == 'On-going'" class="px-3 py-1.5 text-[9px] font-black rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-widest shadow-sm">Processing</span>
+                                    <span ng-show="req.Status == 'Resolved'" class="px-3 py-1.5 text-[9px] font-black rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest shadow-sm">Resolved</span>
                                 </td>
-                                <td class="px-6 py-5">
-                                    <span ng-show="req.Status == 'Pending'" class="px-4 py-1.5 inline-flex text-xs font-black rounded-full bg-amber-100 text-amber-800 border border-amber-200 shadow-sm items-center"><i class="material-icons text-[12px] mr-1">schedule</i> Pending</span>
-                                    <span ng-show="req.Status == 'On-going'" class="px-4 py-1.5 inline-flex text-xs font-black rounded-full bg-brand-100 text-brand-800 border border-brand-200 shadow-sm items-center"><i class="material-icons text-[12px] mr-1">sync</i> On-going</span>
-                                    <span ng-show="req.Status == 'Resolved'" class="px-4 py-1.5 inline-flex text-xs font-black rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm items-center"><i class="material-icons text-[12px] mr-1">done_all</i> Resolved</span>
+                                <td class="px-8 py-6 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button ng-click="triggerEditRequest(req)" class="px-5 py-2.5 text-indigo-700 bg-white border-2 border-indigo-100 hover:border-indigo-300 hover:bg-indigo-50 rounded-xl transition-all font-bold text-xs shadow-sm">Update</button>
                                 </td>
-                                <td class="px-6 py-5 text-right">
-                                    <button ng-click="triggerEditRequest(req)" class="px-4 py-2 text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl shadow-sm hover:shadow-lg hover:shadow-indigo-500/30 transition-all font-bold text-sm mr-2">Update</button>
-                                    <button ng-click="deleteRequest(req)" class="p-2.5 text-red-600 bg-red-50 hover:bg-red-500 hover:text-white rounded-xl shadow-sm hover:shadow-lg hover:shadow-red-500/30 transition-all" title="Delete Log"><i class="material-icons text-sm">delete_outline</i></button>
+                            </tr>
+                            <tr ng-show="hasFilteredRequests() == false">
+                                <td colspan="4" class="text-center py-24">
+                                    <div class="inline-flex items-center justify-center h-20 w-20 rounded-3xl bg-white text-slate-300 mb-6 border border-slate-100 shadow-xl"><i class="material-icons text-4xl">inbox</i></div>
+                                    <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Filter is Empty</h3>
+                                    <p class="text-sm text-slate-500 font-bold">No service tickets match this current view.</p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-                <div ng-show="requestArray.length == 0" class="text-center py-20 bg-gray-50/50">
-                    <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-indigo-50 text-indigo-300 mb-6 border-2 border-dashed border-indigo-200"><i class="material-icons text-5xl">receipt_long</i></div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">No active requests</h3>
-                    <p class="text-gray-500">When residents submit documents or complaints, they will appear here.</p>
-                </div>
             </div>
+            <footer class="mt-auto pt-4 text-center"><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 B-Serve Admin Command Center.</p></footer>
         </div>
     </main>
 </div>
