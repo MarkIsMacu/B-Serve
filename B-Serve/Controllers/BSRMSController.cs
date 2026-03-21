@@ -1,4 +1,7 @@
-﻿using System;
+﻿using B_Serve.Models.Context;
+using B_Serve.Models.Tables;
+using Microsoft.Ajax.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -46,6 +49,37 @@ namespace B_Serve.Controllers
         public ActionResult ResidentDashboard()
         {
             return View();
+        }
+
+        public string UpsertAccount_Status()
+        {
+            try 
+            {
+                using (var connect = new BSRMSContext())
+                {
+                    var account_status = new tbl_request_statuses_model()
+                    {
+                        statusName = "On - going",
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now
+                    };
+                    connect.tbl_request_statuses.Add(account_status);
+                    connect.SaveChanges();
+
+                    return "Success";
+
+                }
+            }
+            catch(Exception ex)
+            {
+                return ErrorHandling(ex.Message, ex.StackTrace, ex.InnerException.ToString());
+            }
+            return "Success";
+        }
+
+        private string ErrorHandling(string message, string stackTrace, string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

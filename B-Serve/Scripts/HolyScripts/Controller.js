@@ -302,4 +302,13 @@
         }
     };
 
+    $scope.UpsertFunc = function () {
+        var upsertData = BSRMSService.UpsertAccount_Status();
+        upsertData.then(function (returedData) {
+            alert(returnData.data);
+        })
+
+    }
+
+
 });
