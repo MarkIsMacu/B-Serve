@@ -1,314 +1,326 @@
-﻿app.controller("BSRMSController", function ($scope) {
+// Controller.js - All the actions on every page happen here
+app.controller("BSRMSController", function ($scope, BSRMSService) {
 
-    // ==========================================================
-    // 1. STORAGE SETUP 
-    // ==========================================================
-    var USER_KEY = "BSRMS_UserArray";
-    var REQUEST_KEY = "BSRMS_RequestArray";
-
-    $scope.getUsers = function () {
-        var data = sessionStorage.getItem(USER_KEY);
-        if (data) { return JSON.parse(data); }
-        else { return []; }
-    };
-
-    $scope.saveUsers = function (users) {
-        sessionStorage.setItem(USER_KEY, JSON.stringify(users));
-    };
-
-    $scope.getRequests = function () {
-        var data = sessionStorage.getItem(REQUEST_KEY);
-        if (data) { return JSON.parse(data); }
-        else { return []; }
-    };
-
-    $scope.saveRequests = function (requests) {
-        sessionStorage.setItem(REQUEST_KEY, JSON.stringify(requests));
-    };
-
-    $scope.userArray = $scope.getUsers();
-    $scope.requestArray = $scope.getRequests();
-
-    if ($scope.userArray.length === 0) {
-        var defaultAdmin = {
-            FirstName: "System", LastName: "Admin", Username: "admin", Password: "123", Role: "Admin", Status: "Verified"
-        };
-        $scope.userArray.push(defaultAdmin);
-        $scope.saveUsers($scope.userArray);
-    }
-
+    // ================================================================
+    // NAVIGATION - go to a different page
+    // ================================================================
     $scope.goTo = function (pageName) {
         window.location.href = "/BSRMS/" + pageName;
     };
 
-    // ==========================================================
-    // 2. HELPER FUNCTIONS
-    // ==========================================================
-
+    // ================================================================
+    // PASSWORD STRENGTH CHECK
+    // ================================================================
     $scope.isPasswordStrong = function (password) {
-        if (!password) { return false; }
-        if (password.length < 8) { return false; }
-
+        if (!password || password.length < 8) return false;
         var hasUpper = /[A-Z]/.test(password);
         var hasLower = /[a-z]/.test(password);
         var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password);
-
-        if (hasUpper == true && hasLower == true && hasSpecial == true) {
-            return true;
-        } else {
-            return false;
-        }
+        return hasUpper && hasLower && hasSpecial;
     };
 
-    $scope.changeUserStatus = function (user, action, successMessage, iconType) {
-        var index = $scope.userArray.indexOf(user);
-        if (index !== -1) {
-            if (action === "Delete") {
-                $scope.userArray.splice(index, 1);
-            } else {
-                $scope.userArray[index].Status = action;
-            }
-            $scope.saveUsers($scope.userArray);
-            Swal.fire("Success", successMessage, iconType);
-        }
-    };
-
-    $scope.countRequests = function (statusToFind) {
-        var count = 0;
-        for (var i = 0; i < $scope.requestArray.length; i++) {
-            if ($scope.requestArray[i].Status === statusToFind) {
-                count++;
-            }
-        }
-        return count;
-    };
-
-    $scope.generatePDFReport = function () {
-        window.print();
-    };
-
-    // ==========================================================
-    // 3. PUBLIC REGISTRATION & LOGIN
-    // ==========================================================
-
+    // ================================================================
+    // REGISTRATION FORM VALIDATION
+    // ================================================================
     $scope.isFormValid = function () {
-        if ($scope.FName && $scope.LName && $scope.Contact &&
-            $scope.Gender && $scope.BlkLot && $scope.Street &&
-            $scope.Purok && $scope.RegUsername && $scope.RegPassword && $scope.RegConfirmPassword) {
-            return true;
-        } else {
-            return false;
-        }
+        return $scope.FName && $scope.LName && $scope.Contact &&
+               $scope.Gender && $scope.BlkLot && $scope.Street &&
+               $scope.Purok && $scope.RegUsername && $scope.RegPassword && $scope.RegConfirmPassword;
     };
 
+    // ================================================================
+    // REGISTRATION - save a new resident into the database
+    // ================================================================
     $scope.saveUser = function () {
         if ($scope.RegPassword !== $scope.RegConfirmPassword) {
             Swal.fire("Error", "Passwords do not match!", "error");
             return;
         }
-        if ($scope.isPasswordStrong($scope.RegPassword) == false) {
+        if (!$scope.isPasswordStrong($scope.RegPassword)) {
             Swal.fire("Weak Password", "Password must be at least 8 characters, with 1 uppercase, 1 lowercase, and 1 special character.", "warning");
             return;
         }
 
-        var newUser = {
-            FirstName: $scope.FName, MiddleName: $scope.MName || "", LastName: $scope.LName, Contact: $scope.Contact, Gender: $scope.Gender,
-            BlkLot: $scope.BlkLot, Street: $scope.Street, Purok: $scope.Purok, FullAddress: $scope.BlkLot + " " + $scope.Street + ", " + $scope.Purok,
-            Username: $scope.RegUsername, Password: $scope.RegPassword, Role: "Resident", Status: "Pending"
+        var userData = {
+            firstName: $scope.FName,
+            middleName: $scope.MName || "",
+            lastName: $scope.LName,
+            contactNumber: $scope.Contact,
+            blkLot: $scope.BlkLot,
+            street: $scope.Street,
+            username: $scope.RegUsername,
+            password: $scope.RegPassword
         };
 
-        $scope.userArray.push(newUser);
-        $scope.saveUsers($scope.userArray);
-
-        Swal.fire({
-            title: "Registration Submitted!", text: "Please wait for admin verification.", icon: "info", confirmButtonColor: "#1976D2"
-        }).then(function () {
-            $scope.goTo("LogIn");
+        BSRMSService.RegisterUser(userData, $scope.Gender, $scope.Purok).then(function (response) {
+            if (response.data.success) {
+                Swal.fire({ title: "Registration Submitted!", text: response.data.message, icon: "info", confirmButtonColor: "#1976D2" })
+                    .then(function () { $scope.goTo("LogIn"); });
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        }).catch(function () {
+            Swal.fire("Server Error", "Could not connect to database.", "error");
         });
     };
 
+    // ================================================================
+    // LOGIN - check credentials then redirect based on role
+    // ================================================================
     $scope.login = function () {
-        var foundUser = null;
-        for (var i = 0; i < $scope.userArray.length; i++) {
-            if ($scope.userArray[i].Username === $scope.LoginUser && $scope.userArray[i].Password === $scope.LoginPass) {
-                foundUser = $scope.userArray[i];
-                break;
-            }
-        }
+        BSRMSService.LoginUser($scope.LoginUser, $scope.LoginPass).then(function (response) {
+            if (response.data.success) {
+                var user = response.data;
 
-        if (foundUser != null) {
-            if (foundUser.Role === "Admin") {
-                sessionStorage.setItem("LoggedInUser", foundUser.Username);
-                $scope.goTo("HomeDashboard");
-            } else if (foundUser.Role === "Resident") {
-                if (foundUser.Status === "Pending") {
-                    Swal.fire("Pending", "Your account is still waiting for Admin verification.", "warning");
-                } else if (foundUser.Status === "Verified") {
-                    sessionStorage.setItem("LoggedInUser", foundUser.Username);
-                    Swal.fire("Success", "You are now logged in.", "success").then(function () {
-                        $scope.goTo("ResidentDashboard");
-                    });
+                // Save who is logged in so other pages can use it
+                sessionStorage.setItem("LoggedInUser", user.username);
+                sessionStorage.setItem("LoggedInRole", user.role);
+
+                if (user.role === "Admin") {
+                    $scope.goTo("HomeDashboard");
+                } else if (user.role === "Resident") {
+                    if (user.status === "Pending") {
+                        Swal.fire("Pending", "Your account is still waiting for Admin verification.", "warning");
+                    } else if (user.status === "Verified") {
+                        Swal.fire("Success", "You are now logged in.", "success")
+                            .then(function () { $scope.goTo("ResidentDashboard"); });
+                    } else {
+                        Swal.fire("Rejected", "Your account has been rejected. Contact the admin.", "error");
+                    }
                 }
+            } else {
+                Swal.fire("Error", response.data.message, "error");
             }
-        } else {
-            Swal.fire("Error", "Wrong Username or Password", "error");
-        }
+        }).catch(function () {
+            Swal.fire("Server Error", "Could not connect to database.", "error");
+        });
     };
 
-    // ==========================================================
-    // 4. ADMIN APPROVALS & USERS CRUD
-    // ==========================================================
+    // ================================================================
+    // ADMIN APPROVAL PAGE - load pending residents from database
+    // ================================================================
+    $scope.userArray = [];
 
-    $scope.verifyUser = function (user) { $scope.changeUserStatus(user, "Verified", "Resident can now log in.", "success"); };
-    $scope.rejectUser = function (user) { $scope.changeUserStatus(user, "Delete", "Registration rejected and removed.", "info"); };
-    $scope.deleteUser = function (user) { $scope.changeUserStatus(user, "Delete", "Resident record deleted.", "warning"); };
+    $scope.loadAllUsers = function () {
+        BSRMSService.GetAllUsers().then(function (response) {
+            if (response.data.success) {
+                $scope.userArray = response.data.data;
+            }
+        });
+    };
 
+    // Call loadAllUsers automatically when page loads (for Approval and Users pages)
+    $scope.loadAllUsers();
+
+    // Approve a resident
+    $scope.verifyUser = function (user) {
+        BSRMSService.ApproveUser(user.usersID).then(function (response) {
+            if (response.data.success) {
+                Swal.fire("Approved!", "Resident can now log in.", "success");
+                $scope.loadAllUsers(); // Refresh the list
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        });
+    };
+
+    // Reject a pending resident
+    $scope.rejectUser = function (user) {
+        BSRMSService.RejectUser(user.usersID).then(function (response) {
+            if (response.data.success) {
+                Swal.fire("Rejected", "Registration rejected and removed.", "info");
+                $scope.loadAllUsers();
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        });
+    };
+
+    // Delete a verified resident
+    $scope.deleteUser = function (user) {
+        BSRMSService.DeleteUser(user.usersID).then(function (response) {
+            if (response.data.success) {
+                Swal.fire("Deleted", "Resident record deleted.", "warning");
+                $scope.loadAllUsers();
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        });
+    };
+
+    // ================================================================
+    // ADMIN DASHBOARD - count stats for the home dashboard
+    // ================================================================
     $scope.getTotalVerifiedResidents = function () {
         var count = 0;
         for (var i = 0; i < $scope.userArray.length; i++) {
-            if ($scope.userArray[i].Role === "Resident" && $scope.userArray[i].Status === "Verified") {
-                count++;
-            }
+            if ($scope.userArray[i].Role === "Resident" && $scope.userArray[i].Status === "Verified") count++;
         }
         return count;
     };
 
+    $scope.countRequests = function (statusToFind) {
+        var count = 0;
+        for (var i = 0; i < $scope.requestArray.length; i++) {
+            if ($scope.requestArray[i].Status === statusToFind) count++;
+        }
+        return count;
+    };
+
+    $scope.generatePDFReport = function () { window.print(); };
+
+    // ================================================================
+    // ADMIN USERS - manual user form
+    // ================================================================
     $scope.showUserForm = false;
     $scope.userEditMode = false;
-    $scope.editUserIndex = -1;
     $scope.tempUser = {};
 
     $scope.openAddUserForm = function () {
-        $scope.showUserForm = true; $scope.userEditMode = false; $scope.tempUser = {};
+        $scope.showUserForm = true;
+        $scope.userEditMode = false;
+        $scope.tempUser = {};
     };
 
     $scope.triggerEditUser = function (user) {
-        $scope.showUserForm = true; $scope.userEditMode = true;
-        $scope.editUserIndex = $scope.userArray.indexOf(user);
+        $scope.showUserForm = true;
+        $scope.userEditMode = true;
         $scope.tempUser = angular.copy(user);
     };
 
+    // Admin adding a new resident manually (uses the same registration endpoint)
     $scope.adminSaveUser = function () {
-        if ($scope.userEditMode == false && $scope.isPasswordStrong($scope.tempUser.Password) == false) {
+        if (!$scope.userEditMode && !$scope.isPasswordStrong($scope.tempUser.Password)) {
             Swal.fire("Weak Password", "Password must be at least 8 characters, 1 uppercase, 1 lowercase, and 1 special character.", "warning");
             return;
         }
 
-        $scope.tempUser.FullAddress = $scope.tempUser.BlkLot + " " + $scope.tempUser.Street + ", " + $scope.tempUser.Purok;
-
-        if ($scope.userEditMode == true) {
-            $scope.userArray[$scope.editUserIndex] = $scope.tempUser;
-            Swal.fire("Updated", "Resident updated successfully", "success");
-        } else {
-            $scope.tempUser.Role = "Resident";
-            $scope.tempUser.Status = "Verified";
-            $scope.userArray.push($scope.tempUser);
-            Swal.fire("Added", "Resident added successfully", "success");
-        }
-
-        $scope.saveUsers($scope.userArray);
-        $scope.showUserForm = false;
-    };
-
-    // ==========================================================
-    // 5. RESIDENT REQUESTS
-    // ==========================================================
-
-    $scope.submitRequest = function () {
-        var newRequest = {
-            Sender: sessionStorage.getItem("LoggedInUser"),
-            Type: $scope.ReqType,
-            Message: $scope.ReqMessage,
-            Status: "Pending",
-            AdminFeedback: ""
+        var userData = {
+            firstName: $scope.tempUser.FirstName,
+            middleName: $scope.tempUser.MiddleName || "",
+            lastName: $scope.tempUser.LastName,
+            contactNumber: $scope.tempUser.Contact,
+            blkLot: $scope.tempUser.BlkLot,
+            street: $scope.tempUser.Street,
+            username: $scope.tempUser.Username,
+            password: $scope.tempUser.Password
         };
 
-        $scope.requestArray.push(newRequest);
-        $scope.saveRequests($scope.requestArray);
-        $scope.ReqMessage = "";
-        Swal.fire("Sent!", "Your request has been submitted.", "success");
-        $scope.loadMyRequests();
-    };
-
-    $scope.myRequests = [];
-    $scope.loadMyRequests = function () {
-        var me = sessionStorage.getItem("LoggedInUser");
-        $scope.myRequests = [];
-        for (var i = 0; i < $scope.requestArray.length; i++) {
-            if ($scope.requestArray[i].Sender === me) {
-                $scope.myRequests.push($scope.requestArray[i]);
+        BSRMSService.RegisterUser(userData, $scope.tempUser.Gender, $scope.tempUser.Purok).then(function (response) {
+            if (response.data.success) {
+                // After adding, approve them automatically (admin adds are always verified)
+                BSRMSService.GetAllUsers().then(function (r) {
+                    var addedUser = r.data.data.filter(function(u) { return u.Username === userData.username; })[0];
+                    if (addedUser) {
+                        BSRMSService.ApproveUser(addedUser.usersID).then(function () {
+                            Swal.fire("Added", "Resident added and verified.", "success");
+                            $scope.loadAllUsers();
+                            $scope.showUserForm = false;
+                        });
+                    }
+                });
+            } else {
+                Swal.fire("Error", response.data.message, "error");
             }
-        }
+        });
     };
 
-    // ==========================================================
-    // 6. ADMIN REQUESTS & FILTERING
-    // ==========================================================
-
+    // ================================================================
+    // ADMIN REQUESTS - load and manage service requests
+    // ================================================================
+    $scope.requestArray = [];
     $scope.currentReqFilter = '';
+
     $scope.setReqFilter = function (status) {
         $scope.currentReqFilter = status;
     };
 
-    // Safe boolean checker for the empty state UI
     $scope.hasFilteredRequests = function () {
-        if ($scope.currentReqFilter === '') {
-            if ($scope.requestArray.length > 0) { return true; }
-            else { return false; }
-        }
-
+        if ($scope.currentReqFilter === '') return $scope.requestArray.length > 0;
         for (var i = 0; i < $scope.requestArray.length; i++) {
-            if ($scope.requestArray[i].Status === $scope.currentReqFilter) {
-                return true;
-            }
+            if ($scope.requestArray[i].Status === $scope.currentReqFilter) return true;
         }
         return false;
     };
 
+    $scope.loadAllRequests = function () {
+        BSRMSService.GetAllRequests().then(function (response) {
+            if (response.data.success) {
+                $scope.requestArray = response.data.data;
+            }
+        });
+    };
+
+    // Load automatically for admin requests page
+    $scope.loadAllRequests();
+
     $scope.showReqForm = false;
     $scope.reqEditMode = false;
-    $scope.editReqIndex = -1;
     $scope.tempReq = {};
 
     $scope.openAddReqForm = function () {
-        $scope.showReqForm = true; $scope.reqEditMode = false; $scope.tempReq = { Status: "Pending", AdminFeedback: "" };
+        $scope.showReqForm = true;
+        $scope.reqEditMode = false;
+        $scope.tempReq = { Status: "Pending", AdminFeedback: "" };
     };
 
     $scope.triggerEditRequest = function (req) {
-        $scope.showReqForm = true; $scope.reqEditMode = true;
-        $scope.editReqIndex = $scope.requestArray.indexOf(req);
+        $scope.showReqForm = true;
+        $scope.reqEditMode = true;
         $scope.tempReq = angular.copy(req);
     };
 
     $scope.adminSaveRequest = function () {
-        if ($scope.reqEditMode == true) {
-            $scope.requestArray[$scope.editReqIndex] = $scope.tempReq;
-            Swal.fire("Updated", "Request updated successfully", "success");
-        } else {
-            $scope.tempReq.Sender = "Admin (Manual Entry)";
-            $scope.requestArray.push($scope.tempReq);
-            Swal.fire("Added", "Request added successfully", "success");
-        }
-        $scope.saveRequests($scope.requestArray);
-        $scope.showReqForm = false;
+        BSRMSService.UpdateRequest($scope.tempReq.requestsID, $scope.tempReq.Status, $scope.tempReq.AdminFeedback).then(function (response) {
+            if (response.data.success) {
+                Swal.fire("Updated", "Request updated successfully.", "success");
+                $scope.loadAllRequests();
+                $scope.showReqForm = false;
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        });
     };
 
     $scope.deleteRequest = function (req) {
-        var index = $scope.requestArray.indexOf(req);
-        if (index !== -1) {
-            $scope.requestArray.splice(index, 1);
-            $scope.saveRequests($scope.requestArray);
-            Swal.fire("Deleted", "Request removed.", "warning");
-        }
+        // Note: No delete endpoint currently - admin manages via status
+        Swal.fire("Info", "To remove a request, set its status to Resolved.", "info");
     };
 
-    $scope.UpsertFunc = function () {
-        var upsertData = BSRMSService.UpsertAccount_Status();
-        upsertData.then(function (returedData) {
-            alert(returnData.data);
-        })
+    // ================================================================
+    // RESIDENT DASHBOARD - load and submit resident requests
+    // ================================================================
+    $scope.myRequests = [];
 
-    }
+    $scope.loadMyRequests = function () {
+        var me = sessionStorage.getItem("LoggedInUser");
+        if (!me) return;
 
+        BSRMSService.GetMyRequests(me).then(function (response) {
+            if (response.data.success) {
+                $scope.myRequests = response.data.data;
+            }
+        });
+    };
+
+    // Resident submits a new request
+    $scope.submitRequest = function () {
+        var me = sessionStorage.getItem("LoggedInUser");
+        BSRMSService.SubmitRequest(me, $scope.ReqType, $scope.ReqMessage).then(function (response) {
+            if (response.data.success) {
+                Swal.fire("Sent!", "Your request has been submitted.", "success");
+                $scope.ReqType = "";
+                $scope.ReqMessage = "";
+                $scope.loadMyRequests(); // Refresh the list
+            } else {
+                Swal.fire("Error", response.data.message, "error");
+            }
+        }).catch(function () {
+            Swal.fire("Server Error", "Could not connect to database.", "error");
+        });
+    };
+
+    // Redundant function kept for compatibility
+    $scope.UpsertFunc = function () {};
 
 });
