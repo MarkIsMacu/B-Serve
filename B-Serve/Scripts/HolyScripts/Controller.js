@@ -32,6 +32,10 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     // REGISTRATION - save a new resident into the database
     // ================================================================
     $scope.saveUser = function () {
+        if ($scope.Contact && $scope.Contact.length !== 11) {
+            Swal.fire("Invalid Contact Number", "Please enter a valid 11-digit mobile number (e.g. 09123456789).", "warning");
+            return;
+        }
         if ($scope.RegPassword !== $scope.RegConfirmPassword) {
             Swal.fire("Error", "Passwords do not match!", "error");
             return;
@@ -105,6 +109,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         BSRMSService.GetAllUsers().then(function (response) {
             if (response.data.success) {
                 $scope.userArray = response.data.data;
+                // Redraw charts once user data is also available
+                setTimeout($scope.drawCharts, 100);
             }
         });
     };
@@ -167,7 +173,77 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         return count;
     };
 
-    $scope.generatePDFReport = function () { window.print(); };
+    // Stamp date and open print dialog
+    $scope.generatePDFReport = function () {
+        var now = new Date();
+        var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var dateStr = now.toLocaleDateString('en-PH', opts) + '  ' + now.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+        var el = document.getElementById('print-date');
+        if (el) el.textContent = dateStr;
+        window.print();
+    };
+
+    // Helper: resolution %, pending %, on-going % — used by the dashboard HTML
+    $scope.currentYear = new Date().getFullYear();
+
+    $scope.getResolutionRate = function () {
+        if ($scope.requestArray.length === 0) return 0;
+        return Math.round(($scope.countRequests('Resolved') / $scope.requestArray.length) * 100);
+    };
+
+    $scope.getPendingRate = function () {
+        if ($scope.requestArray.length === 0) return 0;
+        return Math.round(($scope.countRequests('Pending') / $scope.requestArray.length) * 100);
+    };
+
+    $scope.getOngoingRate = function () {
+        if ($scope.requestArray.length === 0) return 0;
+        return Math.round(($scope.countRequests('On-going') / $scope.requestArray.length) * 100);
+    };
+
+    // Helper: percentage of a count vs total requests (for print report)
+    $scope.getPct = function (count) {
+        if ($scope.requestArray.length === 0) return '0%';
+        return Math.round(count / $scope.requestArray.length * 100) + '%';
+    };
+
+    // Helper: group requests by category — used in print report
+    $scope.getCategoryBreakdown = function () {
+        var counts = {};
+        for (var i = 0; i < $scope.requestArray.length; i++) {
+            var type = $scope.requestArray[i].Type || 'Other';
+            counts[type] = (counts[type] || 0) + 1;
+        }
+        var result = [];
+        var keys = Object.keys(counts);
+        for (var j = 0; j < keys.length; j++) {
+            result.push({ type: keys[j], count: counts[keys[j]] });
+        }
+        return result;
+    };
+
+    // Helper: monthly request + user registration counts for current year
+    $scope.getMonthlyBreakdown = function () {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var reqCounts  = [0,0,0,0,0,0,0,0,0,0,0,0];
+        var userCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        var yr = new Date().getFullYear().toString();
+        for (var i = 0; i < $scope.requestArray.length; i++) {
+            if (!$scope.requestArray[i].CreatedAt) continue;
+            var p = $scope.requestArray[i].CreatedAt.split('-');
+            if (p[0] === yr) reqCounts[parseInt(p[1]) - 1]++;
+        }
+        for (var j = 0; j < $scope.userArray.length; j++) {
+            if (!$scope.userArray[j].CreatedAt) continue;
+            var q = $scope.userArray[j].CreatedAt.split('-');
+            if (q[0] === yr) userCounts[parseInt(q[1]) - 1]++;
+        }
+        var result = [];
+        for (var k = 0; k < months.length; k++) {
+            result.push({ month: months[k], reqCount: reqCounts[k], userCount: userCounts[k] });
+        }
+        return result;
+    };
 
     // ================================================================
     // ADMIN USERS - manual user form
@@ -190,6 +266,10 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
 
     // Admin adding a new resident manually (uses the same registration endpoint)
     $scope.adminSaveUser = function () {
+        if ($scope.tempUser.Contact && $scope.tempUser.Contact.length !== 11) {
+            Swal.fire("Invalid Contact Number", "Please enter a valid 11-digit mobile number.", "warning");
+            return;
+        }
         if (!$scope.userEditMode && !$scope.isPasswordStrong($scope.tempUser.Password)) {
             Swal.fire("Weak Password", "Password must be at least 8 characters, 1 uppercase, 1 lowercase, and 1 special character.", "warning");
             return;
@@ -231,6 +311,12 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     $scope.requestArray = [];
     $scope.currentReqFilter = '';
 
+    // Keep references so we can destroy and redraw charts when data refreshes
+    var statusChartInstance       = null;
+    var categoryChartInstance     = null;
+    var requestTrendChartInstance = null;
+    var userTrendChartInstance    = null;
+
     $scope.setReqFilter = function (status) {
         $scope.currentReqFilter = status;
     };
@@ -247,8 +333,169 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         BSRMSService.GetAllRequests().then(function (response) {
             if (response.data.success) {
                 $scope.requestArray = response.data.data;
+                // Wait for AngularJS to finish rendering, then draw the charts
+                setTimeout($scope.drawCharts, 100);
             }
         });
+    };
+
+    // Draw all 4 dashboard charts using live data
+    $scope.drawCharts = function () {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var currentYear = new Date().getFullYear().toString();
+
+        // Helper: group any array by month for the current year
+        function countByMonth(array, dateField) {
+            var counts = [0,0,0,0,0,0,0,0,0,0,0,0];
+            for (var i = 0; i < array.length; i++) {
+                if (!array[i][dateField]) continue;
+                var parts = array[i][dateField].split('-'); // e.g. "2026-04"
+                if (parts[0] === currentYear) {
+                    counts[parseInt(parts[1]) - 1]++;
+                }
+            }
+            return counts;
+        }
+
+        var pending  = $scope.countRequests('Pending');
+        var ongoing  = $scope.countRequests('On-going');
+        var resolved = $scope.countRequests('Resolved');
+
+        // Count requests per category for horizontal bar
+        var categoryCounts = {};
+        for (var i = 0; i < $scope.requestArray.length; i++) {
+            var type = $scope.requestArray[i].Type || 'Other';
+            categoryCounts[type] = (categoryCounts[type] || 0) + 1;
+        }
+        var categoryLabels = Object.keys(categoryCounts);
+        var categoryValues = [];
+        for (var j = 0; j < categoryLabels.length; j++) {
+            categoryValues.push(categoryCounts[categoryLabels[j]]);
+        }
+
+        var monthlyRequests = countByMonth($scope.requestArray, 'CreatedAt');
+        var monthlyUsers    = countByMonth($scope.userArray,    'CreatedAt');
+
+        // 1. Monthly Request Trend — Line chart (full-width)
+        var reqTrendCanvas = document.getElementById('requestTrendChart');
+        if (reqTrendCanvas) {
+            if (requestTrendChartInstance) requestTrendChartInstance.destroy();
+            requestTrendChartInstance = new Chart(reqTrendCanvas, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Requests',
+                        data: monthlyRequests,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99,102,241,0.07)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' } },
+                        y: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: { size: 10, weight: 'bold' }, color: '#94a3b8' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // 2. Status Donut chart
+        var statusCanvas = document.getElementById('statusChart');
+        if (statusCanvas) {
+            if (statusChartInstance) statusChartInstance.destroy();
+            statusChartInstance = new Chart(statusCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'On-going', 'Resolved'],
+                    datasets: [{
+                        data: [pending, ongoing, resolved],
+                        backgroundColor: ['#fbbf24', '#6366f1', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // 3. Category Horizontal Bar chart
+        var categoryCanvas = document.getElementById('categoryChart');
+        if (categoryCanvas) {
+            if (categoryChartInstance) categoryChartInstance.destroy();
+            categoryChartInstance = new Chart(categoryCanvas, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Requests',
+                        data: categoryValues,
+                        backgroundColor: ['rgba(99,102,241,0.75)','rgba(16,185,129,0.75)','rgba(251,191,36,0.75)','rgba(239,68,68,0.75)','rgba(139,92,246,0.75)'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: { size: 10, weight: 'bold' }, color: '#94a3b8' }, beginAtZero: true },
+                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } }
+                    }
+                }
+            });
+        }
+
+        // 4. Monthly User Registration Trend — Line chart
+        var userTrendCanvas = document.getElementById('userTrendChart');
+        if (userTrendCanvas) {
+            if (userTrendChartInstance) userTrendChartInstance.destroy();
+            userTrendChartInstance = new Chart(userTrendCanvas, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Registrations',
+                        data: monthlyUsers,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.07)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' } },
+                        y: { grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: { size: 10, weight: 'bold' }, color: '#94a3b8' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
     };
 
     // Load automatically for admin requests page
@@ -283,8 +530,28 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     $scope.deleteRequest = function (req) {
-        // Note: No delete endpoint currently - admin manages via status
-        Swal.fire("Info", "To remove a request, set its status to Resolved.", "info");
+        Swal.fire({
+            title: "Delete this request?",
+            text: "This will permanently remove the request from the system.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#64748b",
+            confirmButtonText: "Yes, delete it"
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                BSRMSService.DeleteRequest(req.requestsID).then(function (response) {
+                    if (response.data.success) {
+                        Swal.fire("Deleted", "The request has been removed.", "success");
+                        $scope.loadAllRequests();
+                    } else {
+                        Swal.fire("Error", response.data.message, "error");
+                    }
+                }).catch(function () {
+                    Swal.fire("Server Error", "Could not connect to database.", "error");
+                });
+            }
+        });
     };
 
     // ================================================================

@@ -1,129 +1,372 @@
-﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
 <style>
+    /* ── Screen styles ──────────────────────── */
+    #pdf-report { display: none; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    /* ── Print styles ───────────────────────── */
     @@media print {
-        .no-print {
-            display: none !important;
-        }
+        /* Hide the live UI completely */
+        .screen-only { display: none !important; }
 
-        body {
-            background: white;
-        }
+        /* Show the report */
+        #pdf-report { display: block !important; }
 
-        .print-area {
-            width: 100% !important;
-            padding: 0 !important;
-        }
-    }
+        body { background: white !important; margin: 0; padding: 0; font-family: Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-    ::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
+        /* Page break helper */
+        .page-break { page-break-before: always; }
     }
 </style>
 
-<div class="flex h-screen bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30 relative">
+<!-- ================================================================ -->
+<!-- PRINT REPORT — hidden on screen, shown when printing             -->
+<!-- ================================================================ -->
+<div id="pdf-report" style="font-family: Arial, sans-serif; padding: 40px; max-width: 960px; margin: 0 auto; color: #1e293b;">
+
+    <!-- Header -->
+    <div style="border-bottom: 4px solid #6366f1; padding-bottom: 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <div style="font-size: 9px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: #6366f1; margin-bottom: 6px;">OFFICIAL SYSTEM REPORT</div>
+            <div style="font-size: 26px; font-weight: 900; color: #0f172a; line-height: 1;">B-SERVE Analytics Report</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Barangay Service & Request Management System</div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 9px; color: #94a3b8; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Generated On</div>
+            <div id="print-date" style="font-size: 12px; font-weight: 900; color: #475569; margin-top: 2px;"></div>
+            <div style="margin-top: 6px; background: #6366f1; color: white; font-size: 9px; font-weight: 900; letter-spacing: 2px; padding: 3px 10px; border-radius: 4px; text-transform: uppercase; display: inline-block;">Confidential</div>
+        </div>
+    </div>
+
+    <!-- ── SECTION 1: KPI SUMMARY ── -->
+    <div style="margin-bottom: 28px;">
+        <div style="font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #6366f1; border-left: 4px solid #6366f1; padding-left: 10px; margin-bottom: 14px;">Key Performance Indicators</div>
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+            <tr>
+                <td style="text-align: center; padding: 14px 8px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 30px; font-weight: 900; color: #10b981;">{{ getTotalVerifiedResidents() }}</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-top: 4px;">Verified Residents</div>
+                </td>
+                <td style="text-align: center; padding: 14px 8px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 30px; font-weight: 900; color: #6366f1;">{{ requestArray.length }}</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-top: 4px;">Total Requests</div>
+                </td>
+                <td style="text-align: center; padding: 14px 8px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 30px; font-weight: 900; color: #f59e0b;">{{ countRequests('Pending') }}</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-top: 4px;">Pending</div>
+                </td>
+                <td style="text-align: center; padding: 14px 8px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 30px; font-weight: 900; color: #3b82f6;">{{ countRequests('On-going') }}</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-top: 4px;">On-going</div>
+                </td>
+                <td style="text-align: center; padding: 14px 8px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 30px; font-weight: 900; color: #10b981;">{{ countRequests('Resolved') }}</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-top: 4px;">Resolved</div>
+                </td>
+                <td style="text-align: center; padding: 14px 8px; background: #6366f1; border: 1px solid #4f46e5;">
+                    <div style="font-size: 30px; font-weight: 900; color: white;">{{ getResolutionRate() }}%</div>
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #c7d2fe; margin-top: 4px;">Resolution Rate</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ── SECTION 2: System Performance ── -->
+    <div style="margin-bottom: 28px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 18px;">
+        <div style="font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #6366f1; border-left: 4px solid #6366f1; padding-left: 10px; margin-bottom: 14px;">System Performance Summary</div>
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+            <tr>
+                <td style="padding: 12px 14px; background: white; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Resolution Rate</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #10b981; margin: 2px 0;">{{ getResolutionRate() }}%</div>
+                    <div style="font-size: 10px; color: #64748b;">{{ countRequests('Resolved') }} of {{ requestArray.length }} resolved</div>
+                </td>
+                <td style="padding: 12px 14px; background: white; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Pending Rate</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #f59e0b; margin: 2px 0;">{{ getPendingRate() }}%</div>
+                    <div style="font-size: 10px; color: #64748b;">{{ countRequests('Pending') }} requests pending</div>
+                </td>
+                <td style="padding: 12px 14px; background: white; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">In-Progress Rate</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #6366f1; margin: 2px 0;">{{ getOngoingRate() }}%</div>
+                    <div style="font-size: 10px; color: #64748b;">{{ countRequests('On-going') }} being handled</div>
+                </td>
+                <td style="padding: 12px 14px; background: white; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Active Residents</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #0f172a; margin: 2px 0;">{{ getTotalVerifiedResidents() }}</div>
+                    <div style="font-size: 10px; color: #64748b;">verified in system</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ── SECTION 3: Category + Monthly side by side ── -->
+    <div style="display: flex; gap: 20px; margin-bottom: 28px;">
+
+        <!-- Category Breakdown -->
+        <div style="flex: 1;">
+            <div style="font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #6366f1; border-left: 4px solid #6366f1; padding-left: 10px; margin-bottom: 14px;">Requests by Category</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background: #f1f5f9;">
+                        <th style="padding: 7px 10px; text-align: left; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Category</th>
+                        <th style="padding: 7px 10px; text-align: center; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Count</th>
+                        <th style="padding: 7px 10px; text-align: center; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="cat in getCategoryBreakdown() track by $index" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 7px 10px; font-weight: 700; color: #334155;">{{ cat.type }}</td>
+                        <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #6366f1;">{{ cat.count }}</td>
+                        <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #64748b;">{{ getPct(cat.count) }}</td>
+                    </tr>
+                    <tr ng-show="getCategoryBreakdown().length === 0">
+                        <td colspan="3" style="padding: 14px; text-align: center; color: #94a3b8; font-size: 11px;">No data available.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Monthly Breakdown -->
+        <div style="flex: 1;">
+            <div style="font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #10b981; border-left: 4px solid #10b981; padding-left: 10px; margin-bottom: 14px;">Monthly Breakdown — {{ currentYear }}</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                <thead>
+                    <tr style="background: #f1f5f9;">
+                        <th style="padding: 7px 10px; text-align: left; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Month</th>
+                        <th style="padding: 7px 10px; text-align: center; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Requests</th>
+                        <th style="padding: 7px 10px; text-align: center; font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #e2e8f0;">Registrations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in getMonthlyBreakdown() track by $index" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 7px 10px; font-weight: 700; color: #334155;">{{ item.month }}</td>
+                        <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #6366f1;">{{ item.reqCount }}</td>
+                        <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #10b981;">{{ item.userCount }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ── SECTION 4: All Service Requests ── -->
+    <div class="page-break" style="margin-bottom: 28px;">
+        <div style="font-size: 9px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: #6366f1; border-left: 4px solid #6366f1; padding-left: 10px; margin-bottom: 14px;">All Service Requests</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <thead>
+                <tr style="background: #6366f1; color: white;">
+                    <th style="padding: 9px 10px; text-align: left; font-weight: 900; font-size: 8px; text-transform: uppercase; letter-spacing: 1px; width: 30px;">#</th>
+                    <th style="padding: 9px 10px; text-align: left; font-weight: 900; font-size: 8px; text-transform: uppercase; letter-spacing: 1px;">Sender</th>
+                    <th style="padding: 9px 10px; text-align: left; font-weight: 900; font-size: 8px; text-transform: uppercase; letter-spacing: 1px;">Category</th>
+                    <th style="padding: 9px 10px; text-align: left; font-weight: 900; font-size: 8px; text-transform: uppercase; letter-spacing: 1px;">Status</th>
+                    <th style="padding: 9px 10px; text-align: left; font-weight: 900; font-size: 8px; text-transform: uppercase; letter-spacing: 1px;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="req in requestArray track by $index" ng-style="{'background': $odd ? '#f8fafc' : 'white'}">
+                    <td style="padding: 7px 10px; font-weight: 700; color: #94a3b8; border-bottom: 1px solid #f1f5f9;">{{ $index + 1 }}</td>
+                    <td style="padding: 7px 10px; font-weight: 700; color: #1e293b; border-bottom: 1px solid #f1f5f9;">{{ req.Sender }}</td>
+                    <td style="padding: 7px 10px; color: #475569; border-bottom: 1px solid #f1f5f9;">{{ req.Type }}</td>
+                    <td style="padding: 7px 10px; border-bottom: 1px solid #f1f5f9;">
+                        <span ng-show="req.Status == 'Pending'"  style="background:#fef3c7; color:#92400e; padding:2px 7px; border-radius:3px; font-size:8px; font-weight:900; text-transform:uppercase;">Pending</span>
+                        <span ng-show="req.Status == 'On-going'" style="background:#e0e7ff; color:#3730a3; padding:2px 7px; border-radius:3px; font-size:8px; font-weight:900; text-transform:uppercase;">On-going</span>
+                        <span ng-show="req.Status == 'Resolved'" style="background:#d1fae5; color:#065f46; padding:2px 7px; border-radius:3px; font-size:8px; font-weight:900; text-transform:uppercase;">Resolved</span>
+                    </td>
+                    <td style="padding: 7px 10px; color: #64748b; border-bottom: 1px solid #f1f5f9; font-family: monospace; font-size: 10px;">{{ req.CreatedAt }}</td>
+                </tr>
+                <tr ng-show="requestArray.length === 0">
+                    <td colspan="5" style="padding: 20px; text-align: center; color: #94a3b8; font-size: 11px;">No requests found.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top: 2px solid #e2e8f0; padding-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 9px; color: #94a3b8; font-weight: 700;">© {{ currentYear }} B-Serve Barangay Service System — Confidential Report</div>
+        <div style="font-size: 9px; color: #94a3b8; font-weight: 700;">Page 1</div>
+    </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- SCREEN UI — hidden when printing                                  -->
+<!-- ================================================================ -->
+<div class="screen-only flex h-screen bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30 relative">
 
     <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-violet-400/20 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none"></div>
 
-    <aside class="no-print w-[280px] bg-[#09090b] text-white flex flex-col hidden md:flex z-20 relative border-r border-slate-800">
+    <!-- Sidebar -->
+    <aside class="w-[280px] bg-[#09090b] text-white flex flex-col hidden md:flex z-20 relative border-r border-slate-800">
         <div class="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-indigo-600/30 rounded-full mix-blend-screen filter blur-[80px] pointer-events-none"></div>
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay pointer-events-none"></div>
-
         <div class="h-24 flex items-center px-8 border-b border-white/10 relative z-10">
-            <div class="h-10 w-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 rounded-xl flex items-center justify-center mr-3 shadow-lg shadow-indigo-500/30 ring-2 ring-white/20"><i class="material-icons text-white text-[20px]">holiday_village</i></div>
+            <div class="h-10 w-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 rounded-xl flex items-center justify-center mr-3 shadow-lg ring-2 ring-white/20"><i class="material-icons text-white text-[20px]">holiday_village</i></div>
             <span class="text-xl font-black tracking-widest uppercase">B-SERVE</span>
         </div>
-
         <div class="px-6 py-8 relative z-10">
             <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 pl-1">Administration</p>
             <nav class="space-y-2">
-                <a href="#" class="flex items-center px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25"><i class="material-icons mr-3 text-white text-[20px]">dashboard</i> Dashboard</a>
+                <a href="#" class="flex items-center px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-500/25"><i class="material-icons mr-3 text-white text-[20px]">dashboard</i> Dashboard</a>
                 <a href="#" ng-click="goTo('AdminApproval')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">how_to_reg</i> Approvals</a>
                 <a href="#" ng-click="goTo('AdminUsers')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">people</i> Directory</a>
                 <a href="#" ng-click="goTo('AdminRequest')" class="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl font-bold transition-all group"><i class="material-icons mr-3 text-slate-400 group-hover:text-indigo-400 text-[20px] transition-colors">assignment</i> Requests</a>
             </nav>
         </div>
-
         <div class="mt-auto p-6 relative z-10 border-t border-white/10">
-            <button ng-click="goTo('LogIn')" class="flex items-center justify-center w-full px-4 py-3 bg-white/5 text-slate-300 hover:text-white hover:bg-rose-500/80 rounded-2xl font-bold transition-all backdrop-blur-sm"><i class="material-icons mr-2 text-[20px]">logout</i> Sign Out</button>
+            <button ng-click="goTo('LogIn')" class="flex items-center justify-center w-full px-4 py-3 bg-white/5 text-slate-300 hover:text-white hover:bg-rose-500/80 rounded-2xl font-bold transition-all"><i class="material-icons mr-2 text-[20px]">logout</i> Sign Out</button>
         </div>
     </aside>
 
-    <main class="print-area flex-1 flex flex-col relative animate-slide-up overflow-y-auto z-10">
-        <header class="no-print h-24 bg-white/60 backdrop-blur-2xl border-b border-white sticky top-0 z-30 flex items-center justify-between px-10 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
-            <div><h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">System Overview</h1><p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Live Analytics</p></div>
+    <!-- Main -->
+    <main class="flex-1 flex flex-col relative animate-slide-up overflow-y-auto z-10">
+        <header class="h-24 bg-white/60 backdrop-blur-2xl border-b border-white sticky top-0 z-30 flex items-center justify-between px-10 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
+            <div>
+                <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">System Overview</h1>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Live Analytics &mdash; {{ currentYear }}</p>
+            </div>
             <div class="flex items-center gap-4">
                 <button ng-click="generatePDFReport()" class="flex items-center bg-white border-2 border-slate-100 text-slate-700 text-sm font-black rounded-2xl px-5 py-2.5 hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm active:scale-95"><i class="material-icons mr-2 text-[18px]">picture_as_pdf</i> Export PDF</button>
                 <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 text-indigo-700 flex items-center justify-center font-black border border-indigo-200">A</div>
             </div>
         </header>
 
-        <div class="p-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] relative overflow-hidden group hover:shadow-[0_8px_40px_rgb(79,70,229,0.15)] transition-all">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 z-0"></div>
-                    <div class="relative z-10">
-                        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl w-fit mb-6 border border-emerald-100 shadow-sm"><i class="material-icons text-3xl">verified_user</i></div>
-                        <h2 class="text-6xl font-black text-slate-900 tracking-tighter mb-2">{{ getTotalVerifiedResidents() }}</h2>
-                        <p class="text-slate-400 font-black text-[11px] uppercase tracking-widest">Total Verified Residents</p>
-                    </div>
-                </div>
+        <div class="p-8 flex-1 flex flex-col max-w-7xl mx-auto w-full">
 
-                <div class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] relative overflow-hidden group hover:shadow-[0_8px_40px_rgb(79,70,229,0.15)] transition-all">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br from-indigo-400/20 to-violet-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 z-0"></div>
-                    <div class="relative z-10">
-                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl w-fit mb-6 border border-indigo-100 shadow-sm"><i class="material-icons text-3xl">folder_shared</i></div>
-                        <h2 class="text-6xl font-black text-slate-900 tracking-tighter mb-2">{{ requestArray.length }}</h2>
-                        <p class="text-slate-400 font-black text-[11px] uppercase tracking-widest">Total System Requests</p>
-                    </div>
+            <!-- Stat cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+                <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0_4px_20px_rgb(16,185,129,0.15)] transition-all">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-400/20 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-emerald-50 rounded-xl w-fit mb-3 border border-emerald-100"><i class="material-icons text-[18px] text-emerald-600">verified_user</i></div>
+                    <div class="text-3xl font-black text-slate-900 leading-none mb-1">{{ getTotalVerifiedResidents() }}</div>
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Residents</div>
+                    <div class="text-[9px] font-bold text-emerald-500 mt-1">verified</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0_4px_20px_rgb(99,102,241,0.15)] transition-all">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-indigo-400/20 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-indigo-50 rounded-xl w-fit mb-3 border border-indigo-100"><i class="material-icons text-[18px] text-indigo-600">folder_shared</i></div>
+                    <div class="text-3xl font-black text-slate-900 leading-none mb-1">{{ requestArray.length }}</div>
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Requests</div>
+                    <div class="text-[9px] font-bold text-indigo-400 mt-1">all-time</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0_4px_20px_rgb(251,191,36,0.15)] transition-all">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-amber-400/20 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-amber-50 rounded-xl w-fit mb-3 border border-amber-100"><i class="material-icons text-[18px] text-amber-500">pending_actions</i></div>
+                    <div class="text-3xl font-black text-slate-900 leading-none mb-1">{{ countRequests('Pending') }}</div>
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pending</div>
+                    <div class="text-[9px] font-bold text-amber-500 mt-1">needs review</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0_4px_20px_rgb(99,102,241,0.15)] transition-all">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-400/20 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-blue-50 rounded-xl w-fit mb-3 border border-blue-100"><i class="material-icons text-[18px] text-blue-500">autorenew</i></div>
+                    <div class="text-3xl font-black text-slate-900 leading-none mb-1">{{ countRequests('On-going') }}</div>
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">On-going</div>
+                    <div class="text-[9px] font-bold text-blue-400 mt-1">being handled</div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.05)] relative overflow-hidden group hover:shadow-[0_4px_20px_rgb(16,185,129,0.15)] transition-all">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-teal-400/20 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-teal-50 rounded-xl w-fit mb-3 border border-teal-100"><i class="material-icons text-[18px] text-teal-500">task_alt</i></div>
+                    <div class="text-3xl font-black text-slate-900 leading-none mb-1">{{ countRequests('Resolved') }}</div>
+                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Resolved</div>
+                    <div class="text-[9px] font-bold text-teal-500 mt-1">completed</div>
+                </div>
+                <div class="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl p-5 border border-indigo-500/30 shadow-[0_4px_20px_rgb(99,102,241,0.3)] relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl"></div>
+                    <div class="p-2 bg-white/20 rounded-xl w-fit mb-3"><i class="material-icons text-[18px] text-white">insights</i></div>
+                    <div class="text-3xl font-black text-white leading-none mb-1">{{ getResolutionRate() }}%</div>
+                    <div class="text-[9px] font-black text-indigo-200 uppercase tracking-widest">Resolution</div>
+                    <div class="text-[9px] font-bold text-indigo-300 mt-1">rate</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)]">
-                    <h3 class="text-sm font-black text-slate-900 mb-8 uppercase tracking-widest flex items-center"><div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">analytics</i></div> Live Analysis</h3>
-
-                    <div class="mb-6">
-                        <div class="flex justify-between text-xs font-black text-slate-400 uppercase tracking-widest mb-2"><span>Pending</span><span class="text-slate-900">{{ countRequests('Pending') }}</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner"><div class="bg-gradient-to-r from-amber-400 to-orange-500 h-full rounded-full" style="width: {{ (countRequests('Pending') / requestArray.length) * 100 || 0 }}%"></div></div>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex justify-between text-xs font-black text-slate-400 uppercase tracking-widest mb-2"><span>Processing</span><span class="text-slate-900">{{ countRequests('On-going') }}</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner"><div class="bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-600 h-full rounded-full" style="width: {{ (countRequests('On-going') / requestArray.length) * 100 || 0 }}%"></div></div>
-                    </div>
+            <!-- Monthly Request Trend (full width) -->
+            <div class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8 mb-8">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <div class="flex justify-between text-xs font-black text-slate-400 uppercase tracking-widest mb-2"><span>Resolved</span><span class="text-slate-900">{{ countRequests('Resolved') }}</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner"><div class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full" style="width: {{ (countRequests('Resolved') / requestArray.length) * 100 || 0 }}%"></div></div>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
+                            <div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">show_chart</i></div>
+                            Ticket Volume Trend
+                        </h3>
+                        <p class="text-[10px] text-slate-400 font-bold mt-1 ml-9">Monthly request submissions &mdash; {{ currentYear }}</p>
+                    </div>
+                    <button ng-click="goTo('AdminRequest')" class="flex items-center text-[10px] font-black text-indigo-600 border-2 border-indigo-100 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all">Full Report <i class="material-icons text-[14px] ml-1">arrow_forward</i></button>
+                </div>
+                <div style="position:relative; height:180px;">
+                    <canvas id="requestTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Donut + Horizontal Bar -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8">
+                    <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-widest flex items-center">
+                        <div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">donut_large</i></div>
+                        Ticket Status
+                    </h3>
+                    <p class="text-[10px] text-slate-400 font-bold mb-6 ml-9">Current distribution</p>
+                    <div style="position:relative; height:200px;"><canvas id="statusChart"></canvas></div>
+                    <div class="flex justify-center gap-6 mt-5">
+                        <div class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded-full" style="background:#fbbf24"></span><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</span></div>
+                        <div class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded-full" style="background:#6366f1"></span><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">On-going</span></div>
+                        <div class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded-full" style="background:#10b981"></span><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resolved</span></div>
                     </div>
                 </div>
+                <div class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8">
+                    <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-widest flex items-center">
+                        <div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">bar_chart</i></div>
+                        Tickets by Category
+                    </h3>
+                    <p class="text-[10px] text-slate-400 font-bold mb-6 ml-9">All-time count per issue type</p>
+                    <div style="position:relative; height:200px;"><canvas id="categoryChart"></canvas></div>
+                </div>
+            </div>
 
-                <div class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] flex flex-col border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] overflow-hidden">
-                    <div class="p-8 pb-4 border-b border-white/60"><h3 class="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center"><div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">history</i></div> Recent Activity</h3></div>
-                    <div class="overflow-y-auto flex-1 p-2">
-                        <table class="min-w-full">
-                            <tbody>
-                                <tr ng-repeat="req in requestArray | limitTo: -5 track by $index" class="border-b border-slate-100/50 last:border-0 hover:bg-white/50 transition-colors">
-                                    <td class="px-6 py-5 text-sm font-bold text-slate-900">{{req.Sender}}</td>
-                                    <td class="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest">{{req.Type}}</td>
-                                    <td class="px-6 py-5 text-right">
-                                        <span ng-show="req.Status == 'Pending'" class="px-3 py-1.5 text-[9px] font-black tracking-widest uppercase rounded-lg bg-amber-50 text-amber-600 border border-amber-100">Pending</span>
-                                        <span ng-show="req.Status == 'On-going'" class="px-3 py-1.5 text-[9px] font-black tracking-widest uppercase rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100">Processing</span>
-                                        <span ng-show="req.Status == 'Resolved'" class="px-3 py-1.5 text-[9px] font-black tracking-widest uppercase rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">Resolved</span>
-                                    </td>
-                                </tr>
-                                <tr ng-show="requestArray.length == 0"><td colspan="3" class="text-center py-10 text-slate-400 text-[10px] font-black uppercase tracking-widest">No activity found</td></tr>
-                            </tbody>
-                        </table>
+            <!-- User Trend + System Health -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8">
+                    <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-widest flex items-center">
+                        <div class="p-1.5 bg-emerald-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-emerald-600 block">person_add</i></div>
+                        New User Registrations
+                    </h3>
+                    <p class="text-[10px] text-slate-400 font-bold mb-6 ml-9">Monthly sign-ups &mdash; {{ currentYear }}</p>
+                    <div style="position:relative; height:180px;"><canvas id="userTrendChart"></canvas></div>
+                </div>
+                <div class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-8">
+                    <h3 class="text-sm font-black text-slate-900 mb-1 uppercase tracking-widest flex items-center">
+                        <div class="p-1.5 bg-indigo-50 rounded-lg mr-2"><i class="material-icons text-[18px] text-indigo-600 block">speed</i></div>
+                        System Performance
+                    </h3>
+                    <p class="text-[10px] text-slate-400 font-bold mb-6 ml-9">Key performance indicators</p>
+                    <div class="mb-5">
+                        <div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"><span>Resolution Rate</span><span class="text-emerald-600">{{ getResolutionRate() }}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-700" style="width: {{ getResolutionRate() }}%"></div></div>
+                    </div>
+                    <div class="mb-5">
+                        <div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"><span>Pending Rate</span><span class="text-amber-500">{{ getPendingRate() }}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700" style="width: {{ getPendingRate() }}%"></div></div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"><span>In-Progress Rate</span><span class="text-indigo-500">{{ getOngoingRate() }}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-700" style="width: {{ getOngoingRate() }}%"></div></div>
+                    </div>
+                    <div class="border-t border-slate-100 pt-4">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Recent Activity</p>
+                        <div ng-repeat="req in requestArray | limitTo: -4 track by $index" class="flex items-center justify-between py-2 border-b border-slate-100/50 last:border-0">
+                            <div><span class="text-[11px] font-bold text-slate-800">{{req.Sender}}</span><span class="text-[9px] text-slate-400 font-bold ml-2">{{req.Type}}</span></div>
+                            <span ng-show="req.Status == 'Pending'"  class="px-2 py-1 text-[8px] font-black uppercase rounded bg-amber-50 text-amber-600 border border-amber-100">Pending</span>
+                            <span ng-show="req.Status == 'On-going'" class="px-2 py-1 text-[8px] font-black uppercase rounded bg-indigo-50 text-indigo-600 border border-indigo-100">On-going</span>
+                            <span ng-show="req.Status == 'Resolved'" class="px-2 py-1 text-[8px] font-black uppercase rounded bg-emerald-50 text-emerald-600 border border-emerald-100">Resolved</span>
+                        </div>
+                        <p ng-show="requestArray.length == 0" class="text-[10px] text-slate-400 font-bold text-center py-4">No requests yet</p>
                     </div>
                 </div>
             </div>
-            <footer class="mt-auto pt-6 text-center no-print"><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 B-Serve Admin Command Center.</p></footer>
+
+            <footer class="mt-auto pt-6 text-center"><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 B-Serve Admin Command Center.</p></footer>
         </div>
     </main>
 </div>

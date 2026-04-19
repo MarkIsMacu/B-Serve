@@ -63,4 +63,9 @@ app.service("BSRMSService", function ($http) {
         return $http({ url: "/BSRMS/UpdateRequest", method: "POST", data: { requestsID: requestsID, status: status, adminFeedback: adminFeedback } });
     };
 
+    // Admin permanently deletes a request
+    this.DeleteRequest = function (requestsID) {
+        return $http({ url: "/BSRMS/DeleteRequest", method: "POST", data: { requestsID: requestsID } });
+    };
+
 });

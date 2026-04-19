@@ -1,4 +1,4 @@
-﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
 <div class="flex h-screen bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30 relative">
     <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-[120px] pointer-events-none"></div>
@@ -32,7 +32,9 @@
                 <h3 class="text-2xl font-black text-slate-900 mb-8 flex items-center border-b border-slate-200/60 pb-6"><div class="p-2 bg-indigo-50 rounded-xl mr-4 border border-indigo-100 shadow-sm"><i class="material-icons text-indigo-600 block">edit_document</i></div> {{ reqEditMode ? 'Update Service Ticket' : 'Create Internal Ticket' }}</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
+
+                    <!-- Category: editable when creating, read-only when updating -->
+                    <div ng-hide="reqEditMode">
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-rose-500">*</span></label>
                         <select ng-model="tempReq.Type" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
                             <option value="" disabled selected>Select</option>
@@ -43,6 +45,12 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
+                    <div ng-show="reqEditMode">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
+                        <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500">{{tempReq.Type}}</div>
+                    </div>
+
+                    <!-- Status: always editable -->
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Assign Status <span class="text-rose-500">*</span></label>
                         <select ng-model="tempReq.Status" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
@@ -52,8 +60,22 @@
                         </select>
                     </div>
 
-                    <div class="md:col-span-1"><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-rose-500">*</span></label><textarea ng-model="tempReq.Message" maxlength="500" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none shadow-sm"></textarea></div>
-                    <div class="md:col-span-1"><label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2 pl-1"><i class="material-icons text-[12px] align-baseline mr-1">chat</i> Admin Note to Resident</label><textarea ng-model="tempReq.AdminFeedback" maxlength="500" placeholder="Reply to the resident directly..." class="w-full px-5 py-4 rounded-2xl bg-indigo-50/30 border-2 border-indigo-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none placeholder-slate-400 shadow-sm"></textarea></div>
+                    <!-- Original Message: editable when creating, read-only when updating -->
+                    <div class="md:col-span-1" ng-hide="reqEditMode">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-rose-500">*</span></label>
+                        <textarea ng-model="tempReq.Message" maxlength="500" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none shadow-sm"></textarea>
+                    </div>
+                    <div class="md:col-span-1" ng-show="reqEditMode">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
+                        <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500 min-h-[120px]">{{tempReq.Message}}</div>
+                    </div>
+
+                    <!-- Admin Note: always editable -->
+                    <div class="md:col-span-1">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2 pl-1"><i class="material-icons text-[12px] align-baseline mr-1">chat</i> Admin Note to Resident</label>
+                        <textarea ng-model="tempReq.AdminFeedback" maxlength="500" placeholder="Reply to the resident directly..." class="w-full px-5 py-4 rounded-2xl bg-indigo-50/30 border-2 border-indigo-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none placeholder-slate-400 shadow-sm"></textarea>
+                    </div>
+
                 </div>
 
                 <div class="flex gap-4">
@@ -90,6 +112,7 @@
                                 </td>
                                 <td class="px-8 py-6 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button ng-click="triggerEditRequest(req)" class="px-5 py-2.5 text-indigo-700 bg-white border-2 border-indigo-100 hover:border-indigo-300 hover:bg-indigo-50 rounded-xl transition-all font-bold text-xs shadow-sm">Update</button>
+                                    <button ng-click="deleteRequest(req)" class="px-5 py-2.5 text-rose-600 bg-white border-2 border-rose-100 hover:border-rose-300 hover:bg-rose-50 rounded-xl transition-all font-bold text-xs shadow-sm">Delete</button>
                                 </td>
                             </tr>
                             <tr ng-show="hasFilteredRequests() == false">

@@ -59,6 +59,13 @@ namespace B_Serve.Controllers
             {
                 using (var db = new BSRMSContext())
                 {
+                    // Check if username is already taken
+                    var existingUser = db.tbl_users.FirstOrDefault(u => u.username == input.username);
+                    if (existingUser != null)
+                    {
+                        return Json(new { success = false, message = "Username \"" + input.username + "\" is already taken. Please choose a different one." });
+                    }
+
                     // Find or create Gender
                     var gender = db.tbl_genders.FirstOrDefault(g => g.genderName == input.genderName);
                     if (gender == null) {
@@ -172,7 +179,8 @@ namespace B_Serve.Controllers
                         Purok = puroks.Where(p => p.puroksID == u.puroksID).Select(p => p.purokName).FirstOrDefault() ?? "",
                         FullAddress = u.blkLot + " " + u.street + ", " + (puroks.Where(p => p.puroksID == u.puroksID).Select(p => p.purokName).FirstOrDefault() ?? ""),
                         Role = roles.Where(r => r.rolesID == u.rolesID).Select(r => r.roleName).FirstOrDefault() ?? "Unknown",
-                        Status = statuses.Where(s => s.account_statusesID == u.account_statusesID).Select(s => s.statusName).FirstOrDefault() ?? "Unknown"
+                        Status = statuses.Where(s => s.account_statusesID == u.account_statusesID).Select(s => s.statusName).FirstOrDefault() ?? "Unknown",
+                        CreatedAt = u.createdAt.ToString("yyyy-MM")
                     }).ToList();
 
                     return Json(new { success = true, data = users }, JsonRequestBehavior.AllowGet);
@@ -286,7 +294,8 @@ namespace B_Serve.Controllers
                             Type = categories.Where(c => c.request_categoriesID == r.request_categoriesID).Select(c => c.categoryName).FirstOrDefault() ?? "",
                             Status = reqStatuses.Where(s => s.request_statusesID == r.request_statusesID).Select(s => s.statusName).FirstOrDefault() ?? "Pending",
                             Message = detail != null ? detail.residentMessage : "",
-                            AdminFeedback = detail != null ? detail.adminFeedback : ""
+                            AdminFeedback = detail != null ? detail.adminFeedback : "",
+                            CreatedAt = r.createdAt.ToString("yyyy-MM")
                         };
                     }).ToList();
 
@@ -434,6 +443,36 @@ namespace B_Serve.Controllers
 
                     db.SaveChanges();
                     return Json(new { success = true, message = "Request updated successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + GetFullError(ex) });
+            }
+        }
+
+        // ============================================================
+        // DELETE REQUEST - admin permanently removes a service request
+        // ============================================================
+        [HttpPost]
+        public JsonResult DeleteRequest(int requestsID)
+        {
+            try
+            {
+                using (var db = new BSRMSContext())
+                {
+                    var request = db.tbl_requests.FirstOrDefault(r => r.requestsID == requestsID);
+                    if (request == null) return Json(new { success = false, message = "Request not found." });
+
+                    // Remove the detail row first (child record)
+                    var detail = db.tbl_request_details.FirstOrDefault(d => d.requestsID == requestsID);
+                    if (detail != null) db.tbl_request_details.Remove(detail);
+
+                    // Then remove the request itself
+                    db.tbl_requests.Remove(request);
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Request deleted successfully." });
                 }
             }
             catch (Exception ex)
