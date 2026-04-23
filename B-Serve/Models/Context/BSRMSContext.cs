@@ -1,4 +1,4 @@
-﻿using B_Serve.Models.Maps;
+using B_Serve.Models.Maps;
 using B_Serve.Models.Tables;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,11 @@ namespace B_Serve.Models.Context
         {
             Database.SetInitializer<BSRMSContext>(null);
         }
-        public BSRMSContext() : base("Name=db_bserve") { }
+        public BSRMSContext() : base("Name=db_bserve") 
+        { 
+            this.Configuration.LazyLoadingEnabled = false;
+            this.Configuration.ProxyCreationEnabled = false;
+        }
 
         public virtual DbSet<tbl_account_statuses_model> tbl_account_statuses { get; set; }
 
