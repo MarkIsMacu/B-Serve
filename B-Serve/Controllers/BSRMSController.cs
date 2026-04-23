@@ -10,7 +10,7 @@ namespace B_Serve.Controllers
     public class BSRMSController : Controller
     {
         // ============================================================
-        // PAGE ROUTES - These just return the HTML page views
+        // PAGE ROUTES - Dito natin kinukuha yung mga HTML pages para mag-load.
         // ============================================================
         public ActionResult Index()       { return View(); }
         public ActionResult HomeDashboard()  { return View(); }
@@ -22,7 +22,7 @@ namespace B_Serve.Controllers
         public ActionResult ResidentDashboard() { return View(); }
 
         // ============================================================
-        // HELPER - returns a clean error message including nested ones
+        // HELPER - Para makuha natin yung kumpletong error text kung sakaling may mag-fail.
         // ============================================================
         private string GetFullError(Exception ex)
         {
@@ -33,7 +33,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // INPUT CLASS - flat object from Angular for registration
+        // INPUT CLASS - Dito muna naka-store yung mga data galing sa register form.
         // ============================================================
         public class RegisterUserInput
         {
@@ -50,7 +50,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // REGISTER - saves a new resident to the database
+        // REGISTER - Dito natin sinesave sa database yung bagong user na nag-signup.
         // ============================================================
         [HttpPost]
         public JsonResult RegisterUser(RegisterUserInput input)
@@ -59,14 +59,14 @@ namespace B_Serve.Controllers
             {
                 using (var db = new BSRMSContext())
                 {
-                    // Check if username is already taken
+                    // I-check muna natin kung may kaparehas na username sa database.
                     var existingUser = db.tbl_users.FirstOrDefault(u => u.username == input.username);
                     if (existingUser != null)
                     {
                         return Json(new { success = false, message = "Username \"" + input.username + "\" is already taken. Please choose a different one." });
                     }
 
-                    // Find or create Gender
+                    // Hanapin o gumawa ng bagong gender sa table.
                     var gender = db.tbl_genders.FirstOrDefault(g => g.genderName == input.genderName);
                     if (gender == null) {
                         gender = new tbl_genders_model { genderName = input.genderName, createdAt = DateTime.Now, updatedAt = DateTime.Now };
@@ -74,7 +74,7 @@ namespace B_Serve.Controllers
                         db.SaveChanges();
                     }
 
-                    // Find or create Purok
+                    // Hanapin o gumawa ng bagong purok sa table.
                     var purok = db.tbl_puroks.FirstOrDefault(p => p.purokName == input.purokName);
                     if (purok == null) {
                         purok = new tbl_puroks_model { purokName = input.purokName, createdAt = DateTime.Now, updatedAt = DateTime.Now };
@@ -82,7 +82,7 @@ namespace B_Serve.Controllers
                         db.SaveChanges();
                     }
 
-                    // Role is always Resident, Status is always Pending for new sign-ups
+                    // Set natin as Resident at Pending yung status ng bagong account.
                     var role = db.tbl_roles.FirstOrDefault(r => r.roleName == "Resident");
                     var accStatus = db.tbl_account_statuses.FirstOrDefault(a => a.statusName == "Pending");
 
@@ -117,7 +117,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // LOGIN - checks username and password in the database
+        // LOGIN - I-check natin kung tama yung username at password galing sa database.
         // ============================================================
         [HttpPost]
         public JsonResult LoginUser(string username, string password)
@@ -149,8 +149,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // GET ALL USERS - returns all residents from the database
-        // Used by: AdminApproval, AdminUsers pages
+        // GET ALL USERS - Kukunin natin lahat ng mga residents para makita sa Admin page.
         // ============================================================
         [HttpGet]
         public JsonResult GetAllUsers()
@@ -159,13 +158,13 @@ namespace B_Serve.Controllers
             {
                 using (var db = new BSRMSContext())
                 {
-                    // Get all the lookup table data first
+                    // Kunin muna natin yung listahan ng mga roles at status para hindi ID ang lumabas.
                     var roles = db.tbl_roles.ToList();
                     var statuses = db.tbl_account_statuses.ToList();
                     var genders = db.tbl_genders.ToList();
                     var puroks = db.tbl_puroks.ToList();
 
-                    // Get all users, then map them to a simple object the Angular view can use
+                    // Kunin lahat ng users tapos i-convert sa simpleng format na kailangan ng frontend.
                     var users = db.tbl_users.ToList().Select(u => new {
                         usersID = u.usersID,
                         FirstName = u.firstName,
@@ -193,7 +192,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // APPROVE USER - changes resident status to Verified
+        // APPROVE USER - Papalitan natin ng "Verified" yung status ng resident.
         // ============================================================
         [HttpPost]
         public JsonResult ApproveUser(int usersID)
@@ -220,7 +219,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // REJECT USER - deletes the pending resident registration
+        // REJECT USER - Buburahin natin yung account ng user na na-reject.
         // ============================================================
         [HttpPost]
         public JsonResult RejectUser(int usersID)
@@ -245,7 +244,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // DELETE USER - removes a resident record from the database
+        // DELETE USER - Tanggalin natin yung record ng resident sa database permanently.
         // ============================================================
         [HttpPost]
         public JsonResult DeleteUser(int usersID)
@@ -270,8 +269,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // GET ALL REQUESTS - returns all service requests
-        // Used by: AdminRequest page
+        // GET ALL REQUESTS - Kukunin natin lahat ng service requests para sa Admin page.
         // ============================================================
         [HttpGet]
         public JsonResult GetAllRequests()
@@ -309,8 +307,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // GET MY REQUESTS - returns requests for the logged-in resident
-        // Used by: ResidentDashboard page
+        // GET MY REQUESTS - Kukunin lang natin yung mga requests nung naka-login na user.
         // ============================================================
         [HttpGet]
         public JsonResult GetMyRequests(string username)
@@ -350,7 +347,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // SUBMIT REQUEST - resident submits a new service request
+        // SUBMIT REQUEST - Dito isesave sa database yung bagong request ni resident.
         // ============================================================
         public class SubmitRequestInput
         {
@@ -369,14 +366,14 @@ namespace B_Serve.Controllers
                     var resident = db.tbl_users.FirstOrDefault(u => u.username == input.username);
                     if (resident == null) return Json(new { success = false, message = "User not found." });
 
-                    // Find category
+                    // Hanapin natin yung napiling request category.
                     var category = db.tbl_request_categories.FirstOrDefault(c => c.categoryName == input.type);
                     if (category == null) return Json(new { success = false, message = "Invalid category." });
 
-                    // Status starts as Pending
+                    // Default na "Pending" yung status pagkatuloy ma-submit.
                     var pendingStatus = db.tbl_request_statuses.FirstOrDefault(s => s.statusName == "Pending");
 
-                    // Create the request record
+                    // Gagawa tayo ng record para sa request table.
                     var newRequest = new tbl_requests_model
                     {
                         resident_usersID = resident.usersID,
@@ -388,7 +385,7 @@ namespace B_Serve.Controllers
                     db.tbl_requests.Add(newRequest);
                     db.SaveChanges();
 
-                    // Save the message in request details
+                    // Isesave din natin yung message sa detail table.
                     var newDetail = new tbl_request_details_model
                     {
                         requestsID = newRequest.requestsID,
@@ -410,7 +407,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // UPDATE REQUEST - admin updates a request status and feedback
+        // UPDATE REQUEST - I-a-update ni admin yung status at message ng request.
         // ============================================================
         public class UpdateRequestInput
         {
@@ -429,12 +426,12 @@ namespace B_Serve.Controllers
                     var request = db.tbl_requests.FirstOrDefault(r => r.requestsID == input.requestsID);
                     if (request == null) return Json(new { success = false, message = "Request not found." });
 
-                    // Update status
+                    // Palitan natin yung old status ng bagong status galing sa admin.
                     var newStatus = db.tbl_request_statuses.FirstOrDefault(s => s.statusName == input.status);
                     if (newStatus != null) request.request_statusesID = newStatus.request_statusesID;
                     request.updatedAt = DateTime.Now;
 
-                    // Update admin feedback in details
+                    // Isave din natin yung reply ni admin sa details table.
                     var detail = db.tbl_request_details.FirstOrDefault(d => d.requestsID == input.requestsID);
                     if (detail != null) {
                         detail.adminFeedback = input.adminFeedback ?? "";
@@ -452,7 +449,7 @@ namespace B_Serve.Controllers
         }
 
         // ============================================================
-        // DELETE REQUEST - admin permanently removes a service request
+        // DELETE REQUEST - Ide-delete permanently ni admin yung service request.
         // ============================================================
         [HttpPost]
         public JsonResult DeleteRequest(int requestsID)
@@ -464,11 +461,11 @@ namespace B_Serve.Controllers
                     var request = db.tbl_requests.FirstOrDefault(r => r.requestsID == requestsID);
                     if (request == null) return Json(new { success = false, message = "Request not found." });
 
-                    // Remove the detail row first (child record)
+                    // Buburahin muna natin yung details bago yung mismong request para hindi mag-error.
                     var detail = db.tbl_request_details.FirstOrDefault(d => d.requestsID == requestsID);
                     if (detail != null) db.tbl_request_details.Remove(detail);
 
-                    // Then remove the request itself
+                    // Tapos pwede na natin burahin yung request record.
                     db.tbl_requests.Remove(request);
                     db.SaveChanges();
 

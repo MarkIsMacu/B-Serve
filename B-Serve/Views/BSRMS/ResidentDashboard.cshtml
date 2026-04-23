@@ -1,4 +1,4 @@
-﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
 <div class="min-h-screen bg-slate-50 font-sans relative flex flex-col selection:bg-indigo-500/30 overflow-x-hidden" ng-init="loadMyRequests()">
 
@@ -52,14 +52,20 @@
             </div>
 
             <div class="lg:col-span-7">
-                <div class="bg-white/70 backdrop-blur-2xl rounded-[3rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-10 border border-white min-h-[500px]">
-                    <h3 class="text-2xl font-black text-slate-900 mb-10 flex items-center border-b border-slate-200/60 pb-6"><div class="p-2 bg-emerald-50 rounded-xl mr-4 border border-emerald-100 shadow-sm"><i class="material-icons text-emerald-600 align-text-bottom text-[22px] block">history</i></div> Request History</h3>
+                <div class="bg-white/70 backdrop-blur-2xl rounded-[3rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] p-10 border border-white min-h-[500px] flex flex-col" ng-init="filterStatus = ''">
+                    <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center border-b border-slate-200/60 pb-6"><div class="p-2 bg-emerald-50 rounded-xl mr-4 border border-emerald-100 shadow-sm"><i class="material-icons text-emerald-600 align-text-bottom text-[22px] block">history</i></div> Request History</h3>
 
-                    <div class="space-y-8">
-                        <div ng-repeat="req in myRequests track by $index" class="relative pl-8 border-l-2 border-slate-200/60 group pb-2">
-                            <div class="absolute w-5 h-5 bg-white border-4 border-indigo-500 rounded-full -left-[11px] top-0 shadow-sm group-hover:border-violet-500 transition-colors z-10"></div>
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button ng-click="filterStatus = ''" ng-class="filterStatus === '' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'" class="px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-200">All Requests</button>
+                        <button ng-click="filterStatus = 'Pending'" ng-class="filterStatus === 'Pending' ? 'bg-amber-500 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'" class="px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-200">Pending</button>
+                        <button ng-click="filterStatus = 'On-going'" ng-class="filterStatus === 'On-going' ? 'bg-indigo-500 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'" class="px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-200">Processing</button>
+                        <button ng-click="filterStatus = 'Resolved'" ng-class="filterStatus === 'Resolved' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'" class="px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-200">Resolved</button>
+                    </div>
 
-                            <div class="bg-white rounded-[2rem] p-8 border border-white shadow-sm relative group-hover:border-indigo-100 transition-colors">
+                    <div class="space-y-5 flex-1 overflow-y-auto pr-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full pb-4" style="max-height: 550px;">
+                        <div ng-repeat="req in myRequests | filter:(filterStatus ? {Status: filterStatus} : {}) track by $index" class="relative group">
+                            <div class="bg-white rounded-[2rem] p-7 border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] relative hover:shadow-[0_8px_30px_rgb(99,102,241,0.08)] hover:-translate-y-1 transition-all duration-300">
                                 <div class="absolute top-6 right-6">
                                     <span ng-show="req.Status == 'Pending'" class="px-3 py-1.5 text-[9px] font-black rounded-md bg-amber-50 text-amber-600 uppercase tracking-widest border border-amber-100 shadow-sm">Pending</span>
                                     <span ng-show="req.Status == 'On-going'" class="px-3 py-1.5 text-[9px] font-black rounded-md bg-indigo-50 text-indigo-600 uppercase tracking-widest border border-indigo-100 shadow-sm">Processing</span>
@@ -69,17 +75,17 @@
                                 <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2"><i class="material-icons text-[14px] align-text-bottom mr-1 text-slate-300">sell</i> {{req.Type}}</div>
                                 <p class="text-slate-900 text-sm font-bold pr-20 leading-relaxed">{{req.Message}}</p>
 
-                                <div ng-show="req.AdminFeedback" class="mt-6 p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
-                                    <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1.5 flex items-center"><i class="material-icons text-[14px] mr-1">subdirectory_arrow_right</i> Admin Reply</p>
-                                    <p class="text-slate-900 text-sm font-bold">"{{req.AdminFeedback}}"</p>
+                                <div ng-show="req.AdminFeedback" class="mt-6 p-5 bg-gradient-to-r from-indigo-50/80 to-white border border-indigo-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)]">
+                                    <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-2 flex items-center"><i class="material-icons text-[14px] mr-1.5 text-indigo-400">forum</i> Admin Reply</p>
+                                    <p class="text-slate-700 text-sm font-semibold italic border-l-2 border-indigo-300 pl-3 py-1">{{req.AdminFeedback}}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div ng-show="myRequests.length == 0" class="text-center py-20">
+                        <div ng-show="(myRequests | filter:(filterStatus ? {Status: filterStatus} : {})).length == 0" class="text-center py-20">
                             <div class="inline-flex items-center justify-center h-20 w-20 rounded-3xl bg-white text-slate-300 mb-6 border border-slate-100 shadow-xl"><i class="material-icons text-4xl">inbox</i></div>
-                            <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">No Active Submissions</h4>
-                            <p class="text-sm text-slate-500 font-bold">Your document requests will be tracked here.</p>
+                            <h4 class="text-xl font-black text-slate-900 mb-2 tracking-tight">No Requests Found</h4>
+                            <p class="text-sm text-slate-500 font-bold">There are no records matching your current filter.</p>
                         </div>
                     </div>
                 </div>

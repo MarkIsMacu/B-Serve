@@ -20,6 +20,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
+        // Store the base URL to prevent 404 routing errors in Visual Studio's IIS Express
+        window.appBaseUrl = '@Url.Content("~")';
+        
         tailwind.config = {
             theme: {
                 extend: {

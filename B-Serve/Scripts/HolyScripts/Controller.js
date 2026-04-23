@@ -2,14 +2,16 @@
 app.controller("BSRMSController", function ($scope, BSRMSService) {
 
     // ================================================================
-    // NAVIGATION - go to a different page
+    // NAVIGATION - Dito tayo gumagalaw papunta sa ibang page ng website.
     // ================================================================
     $scope.goTo = function (pageName) {
-        window.location.href = "/BSRMS/" + pageName;
+        var baseUrl = window.appBaseUrl || "/";
+        if (!baseUrl.endsWith("/")) baseUrl += "/";
+        window.location.href = baseUrl + "BSRMS/" + pageName;
     };
 
     // ================================================================
-    // PASSWORD STRENGTH CHECK
+    // PASSWORD STRENGTH CHECK - Para ma-check kung safe yung password.
     // ================================================================
     $scope.isPasswordStrong = function (password) {
         if (!password || password.length < 8) return false;
@@ -20,7 +22,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // REGISTRATION FORM VALIDATION
+    // REGISTRATION FORM VALIDATION - I-check kung may laman lahat ng textboxes.
     // ================================================================
     $scope.isFormValid = function () {
         return $scope.FName && $scope.LName && $scope.Contact &&
@@ -29,7 +31,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // REGISTRATION - save a new resident into the database
+    // REGISTRATION - Isesave yung bagong user sa database kung tama ang input.
     // ================================================================
     $scope.saveUser = function () {
         if ($scope.Contact && $scope.Contact.length !== 11) {
@@ -69,7 +71,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // LOGIN - check credentials then redirect based on role
+    // LOGIN - I-verify yung username at password tapos i-redirect sa tamang dashboard.
     // ================================================================
     $scope.login = function () {
         BSRMSService.LoginUser($scope.LoginUser, $scope.LoginPass).then(function (response) {
@@ -101,7 +103,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // ADMIN APPROVAL PAGE - load pending residents from database
+    // ADMIN APPROVAL PAGE - I-load lahat ng residents para makita sa admin table.
     // ================================================================
     $scope.userArray = [];
 
@@ -115,7 +117,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         });
     };
 
-    // Call loadAllUsers automatically when page loads (for Approval and Users pages)
+    // Tatawagin natin ito para automatic mag-load yung users pagkabukas ng page.
     $scope.loadAllUsers();
 
     // Approve a resident
@@ -155,7 +157,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // ADMIN DASHBOARD - count stats for the home dashboard
+    // ADMIN DASHBOARD - Para makapag-bilang tayo ng stats sa dashboard.
     // ================================================================
     $scope.getTotalVerifiedResidents = function () {
         var count = 0;
@@ -246,7 +248,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // ADMIN USERS - manual user form
+    // ADMIN USERS - Dito si admin pwedeng mag-add manually ng resident.
     // ================================================================
     $scope.showUserForm = false;
     $scope.userEditMode = false;
@@ -306,7 +308,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // ADMIN REQUESTS - load and manage service requests
+    // ADMIN REQUESTS - Dito tayo kukuha at mag-mamanage ng mga service requests.
     // ================================================================
     $scope.requestArray = [];
     $scope.currentReqFilter = '';
@@ -555,7 +557,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // ================================================================
-    // RESIDENT DASHBOARD - load and submit resident requests
+    // RESIDENT DASHBOARD - Dito maglo-load at magsa-submit si resident ng requests niya.
     // ================================================================
     $scope.myRequests = [];
 

@@ -1,7 +1,14 @@
-// Service.js - This file handles all HTTP calls to the C# backend (database)
+// Service.js - Dito dumadaan lahat ng request papuntang C# backend at database.
 app.service("BSRMSService", function ($http) {
 
-    // Register a new resident
+    // Helper para sure na tama yung URL kahit naka-host pa ito sa Visual Studio IIS.
+    var baseUrl = window.appBaseUrl || "/";
+    if (!baseUrl.endsWith("/")) baseUrl += "/";
+    function getApiUrl(endpoint) {
+        return baseUrl + endpoint;
+    }
+
+    // Para mag-register ng bagong resident sa system.
     this.RegisterUser = function (userData, genderName, purokName) {
         var flatData = {
             firstName: userData.firstName,
@@ -15,57 +22,57 @@ app.service("BSRMSService", function ($http) {
             genderName: genderName,
             purokName: purokName
         };
-        return $http({ url: "/BSRMS/RegisterUser", method: "POST", data: flatData });
+        return $http({ url: getApiUrl("BSRMS/RegisterUser"), method: "POST", data: flatData });
     };
 
-    // Log in a user
+    // Para mag-login ang isang user.
     this.LoginUser = function (username, password) {
-        return $http({ url: "/BSRMS/LoginUser", method: "POST", data: { username: username, password: password } });
+        return $http({ url: getApiUrl("BSRMS/LoginUser"), method: "POST", data: { username: username, password: password } });
     };
 
-    // Get all users from the database
+    // Kukunin natin lahat ng registered users galing database.
     this.GetAllUsers = function () {
-        return $http({ url: "/BSRMS/GetAllUsers", method: "GET" });
+        return $http({ url: getApiUrl("BSRMS/GetAllUsers"), method: "GET" });
     };
 
-    // Approve a pending resident
+    // Para i-approve yung pending na resident account.
     this.ApproveUser = function (usersID) {
-        return $http({ url: "/BSRMS/ApproveUser", method: "POST", data: { usersID: usersID } });
+        return $http({ url: getApiUrl("BSRMS/ApproveUser"), method: "POST", data: { usersID: usersID } });
     };
 
-    // Reject and remove a pending resident
+    // Para i-reject at burahin yung pending na resident account.
     this.RejectUser = function (usersID) {
-        return $http({ url: "/BSRMS/RejectUser", method: "POST", data: { usersID: usersID } });
+        return $http({ url: getApiUrl("BSRMS/RejectUser"), method: "POST", data: { usersID: usersID } });
     };
 
-    // Delete a verified resident
+    // Para i-delete ng tuluyan ang isang verified na resident.
     this.DeleteUser = function (usersID) {
-        return $http({ url: "/BSRMS/DeleteUser", method: "POST", data: { usersID: usersID } });
+        return $http({ url: getApiUrl("BSRMS/DeleteUser"), method: "POST", data: { usersID: usersID } });
     };
 
-    // Get all service requests (for admin)
+    // Kukunin natin lahat ng service requests para makita ni admin.
     this.GetAllRequests = function () {
-        return $http({ url: "/BSRMS/GetAllRequests", method: "GET" });
+        return $http({ url: getApiUrl("BSRMS/GetAllRequests"), method: "GET" });
     };
 
-    // Get requests for a specific resident
+    // Kukunin lang natin yung mga requests na ginawa nung naka-login na user.
     this.GetMyRequests = function (username) {
-        return $http({ url: "/BSRMS/GetMyRequests", method: "GET", params: { username: username } });
+        return $http({ url: getApiUrl("BSRMS/GetMyRequests"), method: "GET", params: { username: username } });
     };
 
-    // Resident submits a new service request
+    // Para makapag-submit ng bagong document request si resident.
     this.SubmitRequest = function (username, type, message) {
-        return $http({ url: "/BSRMS/SubmitRequest", method: "POST", data: { username: username, type: type, message: message } });
+        return $http({ url: getApiUrl("BSRMS/SubmitRequest"), method: "POST", data: { username: username, type: type, message: message } });
     };
 
-    // Admin updates a request status and feedback
+    // Para ma-update ni admin yung status at makapag-reply siya sa request.
     this.UpdateRequest = function (requestsID, status, adminFeedback) {
-        return $http({ url: "/BSRMS/UpdateRequest", method: "POST", data: { requestsID: requestsID, status: status, adminFeedback: adminFeedback } });
+        return $http({ url: getApiUrl("BSRMS/UpdateRequest"), method: "POST", data: { requestsID: requestsID, status: status, adminFeedback: adminFeedback } });
     };
 
-    // Admin permanently deletes a request
+    // Para ma-delete ng tuluyan ni admin ang isang request.
     this.DeleteRequest = function (requestsID) {
-        return $http({ url: "/BSRMS/DeleteRequest", method: "POST", data: { requestsID: requestsID } });
+        return $http({ url: getApiUrl("BSRMS/DeleteRequest"), method: "POST", data: { requestsID: requestsID } });
     };
 
 });
