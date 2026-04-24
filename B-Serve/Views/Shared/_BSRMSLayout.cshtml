@@ -31,11 +31,17 @@
             inset: 0;
             background: #f8fafc;
             z-index: 99999;
+            opacity: 1; /* Start fully opaque to hide loading flashes */
+            pointer-events: all;
+            transition: opacity 0.25s ease;
+        }
+        /* Kapag nag-load na ang page, itatago na ang overlay */
+        #bserve-page-overlay.loaded {
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.18s ease;
         }
-        #bserve-page-overlay.fading-out {
+        /* Kapag paalis na ang page (navigating away), ibabalik ang overlay */
+        #bserve-page-overlay.navigating {
             opacity: 1;
             pointer-events: all;
         }
@@ -133,11 +139,12 @@
 
                 // I-fade out ang current page gamit ang overlay
                 if (overlay) {
-                    overlay.classList.add('fading-out');
-                    // Mag-navigate pagkatapos ng fade (180ms)
+                    overlay.classList.remove('loaded');
+                    overlay.classList.add('navigating');
+                    // Mag-navigate pagkatapos ng fade (200ms)
                     setTimeout(function () {
                         window.location.href = url;
-                    }, 180);
+                    }, 200);
                 } else {
                     // Fallback kung hindi pa naka-render ang overlay
                     window.location.href = url;
@@ -148,9 +155,13 @@
         // Kapag nag-load na ang bagong page — i-fade in at itago ang overlay.
         window.addEventListener('load', function () {
             var bar = document.getElementById('bserve-progress-bar');
-            if (bar) {
-                bar.className = 'done';
-            }
+            if (bar) bar.className = 'done';
+            
+            // Bigyan ng konting delay bago tanggalin ang overlay para maka-render muna si Angular
+            setTimeout(function() {
+                var overlay = document.getElementById('bserve-page-overlay');
+                if (overlay) overlay.classList.add('loaded');
+            }, 50);
         });
     </script>
 </head>

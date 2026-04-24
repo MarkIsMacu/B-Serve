@@ -32,8 +32,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     // ================================================================
     $scope.isFormValid = function () {
         return $scope.FName && $scope.LName && $scope.Contact &&
-               $scope.Gender && $scope.BlkLot && $scope.Street &&
-               $scope.Purok && $scope.RegUsername && $scope.RegPassword && $scope.RegConfirmPassword;
+            $scope.Gender && $scope.BlkLot && $scope.Street &&
+            $scope.Purok && $scope.RegUsername && $scope.RegPassword && $scope.RegConfirmPassword;
     };
 
     // ================================================================
@@ -234,9 +234,9 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
 
     // Helper: monthly request + user registration counts for current year
     $scope.getMonthlyBreakdown = function () {
-        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        var reqCounts  = [0,0,0,0,0,0,0,0,0,0,0,0];
-        var userCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var reqCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var userCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var yr = new Date().getFullYear().toString();
         for (var i = 0; i < $scope.requestArray.length; i++) {
             if (!$scope.requestArray[i].CreatedAt) continue;
@@ -316,7 +316,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
                 if (response.data.success) {
                     // Awtomatikong i-approve ang resident na dinagdag ng admin.
                     BSRMSService.GetAllUsers().then(function (r) {
-                        var addedUser = r.data.data.filter(function(u) { return u.Username === userData.username; })[0];
+                        var addedUser = r.data.data.filter(function (u) { return u.Username === userData.username; })[0];
                         if (addedUser) {
                             BSRMSService.ApproveUser(addedUser.usersID).then(function () {
                                 Swal.fire("Added", "Resident added and verified.", "success");
@@ -342,10 +342,10 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     $scope.currentReqFilter = '';
 
     // Keep references so we can destroy and redraw charts when data refreshes
-    var statusChartInstance       = null;
-    var categoryChartInstance     = null;
+    var statusChartInstance = null;
+    var categoryChartInstance = null;
     var requestTrendChartInstance = null;
-    var userTrendChartInstance    = null;
+    var userTrendChartInstance = null;
 
     $scope.setReqFilter = function (status) {
         $scope.currentReqFilter = status;
@@ -373,12 +373,12 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
 
     // Draw all 4 dashboard charts using live data
     $scope.drawCharts = function () {
-        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var currentYear = new Date().getFullYear().toString();
 
         // Helper: group any array by month for the current year
         function countByMonth(array, dateField) {
-            var counts = [0,0,0,0,0,0,0,0,0,0,0,0];
+            var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             for (var i = 0; i < array.length; i++) {
                 if (!array[i][dateField]) continue;
                 var parts = array[i][dateField].split('-'); // e.g. "2026-04"
@@ -389,8 +389,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             return counts;
         }
 
-        var pending  = $scope.countRequests('Pending');
-        var ongoing  = $scope.countRequests('On-going');
+        var pending = $scope.countRequests('Pending');
+        var ongoing = $scope.countRequests('On-going');
         var resolved = $scope.countRequests('Resolved');
 
         // Count requests per category for horizontal bar
@@ -406,7 +406,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         }
 
         var monthlyRequests = countByMonth($scope.requestArray, 'CreatedAt');
-        var monthlyUsers    = countByMonth($scope.userArray,    'CreatedAt');
+        var monthlyUsers = countByMonth($scope.userArray, 'CreatedAt');
 
         // 1. Monthly Request Trend — Line chart (full-width)
         var reqTrendCanvas = document.getElementById('requestTrendChart');
@@ -477,7 +477,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
                     datasets: [{
                         label: 'Requests',
                         data: categoryValues,
-                        backgroundColor: ['rgba(99,102,241,0.75)','rgba(16,185,129,0.75)','rgba(251,191,36,0.75)','rgba(239,68,68,0.75)','rgba(139,92,246,0.75)'],
+                        backgroundColor: ['rgba(99,102,241,0.75)', 'rgba(16,185,129,0.75)', 'rgba(251,191,36,0.75)', 'rgba(239,68,68,0.75)', 'rgba(139,92,246,0.75)'],
                         borderRadius: 8,
                         borderSkipped: false
                     }]
@@ -625,7 +625,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.loadAllUsers();
         $scope.loadAllRequests();
     } else if (currentPage.indexOf('AdminApproval') !== -1 ||
-               currentPage.indexOf('AdminUsers') !== -1) {
+        currentPage.indexOf('AdminUsers') !== -1) {
         // Approval at Directory pages: users lang ang kailangan.
         $scope.loadAllUsers();
     } else if (currentPage.indexOf('AdminRequest') !== -1) {
