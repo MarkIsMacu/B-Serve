@@ -1,4 +1,4 @@
-﻿@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
+@{ Layout = "~/Views/Shared/_BSRMSLayout.cshtml"; }
 
 <div class="flex h-screen bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30 relative">
 
@@ -21,8 +21,11 @@
     </aside>
 
     <main class="flex-1 flex flex-col relative animate-slide-up overflow-y-auto z-10">
-        <header class="h-24 bg-white/60 backdrop-blur-2xl border-b border-white sticky top-0 z-30 flex items-center px-10 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
-            <div><h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">Pending Approvals</h1><p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Review resident applications</p></div>
+        <header class="h-32 bg-white/70 backdrop-blur-3xl border-b border-slate-200/60 sticky top-0 z-30 flex items-center justify-between px-12 shadow-sm transition-all">
+            <div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-900 to-slate-800 tracking-tight">Pending Approvals</h1>
+                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-2">Review Resident Applications</p>
+            </div>
         </header>
 
         <div class="p-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">

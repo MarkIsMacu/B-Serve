@@ -37,6 +37,7 @@ namespace B_Serve.Controllers
         // ============================================================
         public class RegisterUserInput
         {
+            public int usersID { get; set; }
             public string firstName { get; set; }
             public string middleName { get; set; }
             public string lastName { get; set; }
@@ -60,7 +61,7 @@ namespace B_Serve.Controllers
                 using (var db = new BSRMSContext())
                 {
                     // I-check muna natin kung may kaparehas na username sa database.
-                    var existingUser = db.tbl_users.FirstOrDefault(u => u.username == input.username);
+                    var existingUser = db.tbl_users.FirstOrDefault(u => u.username == input.username && u.usersID != input.usersID);
                     if (existingUser != null)
                     {
                         return Json(new { success = false, message = "Username \"" + input.username + "\" is already taken. Please choose a different one." });
@@ -80,6 +81,30 @@ namespace B_Serve.Controllers
                         purok = new tbl_puroks_model { purokName = input.purokName, createdAt = DateTime.Now, updatedAt = DateTime.Now };
                         db.tbl_puroks.Add(purok);
                         db.SaveChanges();
+                    }
+
+                    if (input.usersID > 0)
+                    {
+                        var userToUpdate = db.tbl_users.FirstOrDefault(u => u.usersID == input.usersID);
+                        if (userToUpdate != null)
+                        {
+                            userToUpdate.firstName = input.firstName;
+                            userToUpdate.middleName = input.middleName ?? "";
+                            userToUpdate.lastName = input.lastName;
+                            userToUpdate.contactNumber = input.contactNumber;
+                            userToUpdate.blkLot = input.blkLot;
+                            userToUpdate.street = input.street;
+                            userToUpdate.username = input.username;
+                            if (!string.IsNullOrEmpty(input.password)) {
+                                userToUpdate.password = input.password;
+                            }
+                            userToUpdate.gendersID = gender.gendersID;
+                            userToUpdate.puroksID = purok.puroksID;
+                            userToUpdate.updatedAt = DateTime.Now;
+                            
+                            db.SaveChanges();
+                            return Json(new { success = true, message = "Resident data updated successfully!" });
+                        }
                     }
 
                     // Set natin as Resident at Pending yung status ng bagong account.
@@ -260,6 +285,85 @@ namespace B_Serve.Controllers
                     db.SaveChanges();
 
                     return Json(new { success = true, message = "Resident record deleted." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + GetFullError(ex) });
+            }
+        }
+
+        // ============================================================
+        // UPDATE USER - I-a-update ni admin yung data ng existing resident.
+        // ============================================================
+        public class UpdateUserInput
+        {
+            public int usersID { get; set; }
+            public string firstName { get; set; }
+            public string middleName { get; set; }
+            public string lastName { get; set; }
+            public string contactNumber { get; set; }
+            public string blkLot { get; set; }
+            public string street { get; set; }
+            public string username { get; set; }
+            public string password { get; set; }
+            public string genderName { get; set; }
+            public string purokName { get; set; }
+        }
+
+        [HttpPost]
+        public JsonResult UpdateUser(UpdateUserInput input)
+        {
+            try
+            {
+                using (var db = new BSRMSContext())
+                {
+                    // Hanapin yung user na ie-edit based sa kanyang ID.
+                    var user = db.tbl_users.FirstOrDefault(u => u.usersID == input.usersID);
+                    if (user == null)
+                        return Json(new { success = false, message = "Resident not found." });
+
+                    // I-check kung may ibang user na may ganitong username (hindi yung sarili niya).
+                    var usernameConflict = db.tbl_users.FirstOrDefault(u => u.username == input.username && u.usersID != input.usersID);
+                    if (usernameConflict != null)
+                        return Json(new { success = false, message = "Username \"" + input.username + "\" is already taken by another resident." });
+
+                    // Hanapin o gumawa ng gender record.
+                    var gender = db.tbl_genders.FirstOrDefault(g => g.genderName == input.genderName);
+                    if (gender == null)
+                    {
+                        gender = new tbl_genders_model { genderName = input.genderName, createdAt = DateTime.Now, updatedAt = DateTime.Now };
+                        db.tbl_genders.Add(gender);
+                        db.SaveChanges();
+                    }
+
+                    // Hanapin o gumawa ng purok record.
+                    var purok = db.tbl_puroks.FirstOrDefault(p => p.purokName == input.purokName);
+                    if (purok == null)
+                    {
+                        purok = new tbl_puroks_model { purokName = input.purokName, createdAt = DateTime.Now, updatedAt = DateTime.Now };
+                        db.tbl_puroks.Add(purok);
+                        db.SaveChanges();
+                    }
+
+                    // I-update ang lahat ng fields ng resident.
+                    user.firstName = input.firstName;
+                    user.middleName = input.middleName ?? "";
+                    user.lastName = input.lastName;
+                    user.contactNumber = input.contactNumber;
+                    user.blkLot = input.blkLot;
+                    user.street = input.street;
+                    user.username = input.username;
+                    user.gendersID = gender.gendersID;
+                    user.puroksID = purok.puroksID;
+                    user.updatedAt = DateTime.Now;
+
+                    // I-update lang yung password kung may bagong binigay.
+                    if (!string.IsNullOrEmpty(input.password))
+                        user.password = input.password;
+
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Resident data updated successfully!" });
                 }
             }
             catch (Exception ex)

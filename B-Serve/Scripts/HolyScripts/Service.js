@@ -11,6 +11,7 @@ app.service("BSRMSService", function ($http) {
     // Para mag-register ng bagong resident sa system.
     this.RegisterUser = function (userData, genderName, purokName) {
         var flatData = {
+            usersID: userData.usersID || 0,
             firstName: userData.firstName,
             middleName: userData.middleName,
             lastName: userData.lastName,
@@ -48,6 +49,27 @@ app.service("BSRMSService", function ($http) {
     // Para i-delete ng tuluyan ang isang verified na resident.
     this.DeleteUser = function (usersID) {
         return $http({ url: getApiUrl("BSRMS/DeleteUser"), method: "POST", data: { usersID: usersID } });
+    };
+
+    // Para i-update yung data ng isang existing resident (hiwalay sa RegisterUser).
+    this.UpdateUser = function (userData, genderName, purokName) {
+        return $http({
+            url: getApiUrl("BSRMS/UpdateUser"),
+            method: "POST",
+            data: {
+                usersID: userData.usersID,
+                firstName: userData.firstName,
+                middleName: userData.middleName || "",
+                lastName: userData.lastName,
+                contactNumber: userData.contactNumber,
+                blkLot: userData.blkLot,
+                street: userData.street,
+                username: userData.username,
+                password: userData.password || "",
+                genderName: genderName,
+                purokName: purokName
+            }
+        });
     };
 
     // Kukunin natin lahat ng service requests para makita ni admin.

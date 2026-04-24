@@ -272,12 +272,9 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             Swal.fire("Invalid Contact Number", "Please enter a valid 11-digit mobile number.", "warning");
             return;
         }
-        if (!$scope.userEditMode && !$scope.isPasswordStrong($scope.tempUser.Password)) {
-            Swal.fire("Weak Password", "Password must be at least 8 characters, 1 uppercase, 1 lowercase, and 1 special character.", "warning");
-            return;
-        }
 
         var userData = {
+            usersID: $scope.tempUser.usersID,
             firstName: $scope.tempUser.FirstName,
             middleName: $scope.tempUser.MiddleName || "",
             lastName: $scope.tempUser.LastName,
@@ -285,27 +282,50 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             blkLot: $scope.tempUser.BlkLot,
             street: $scope.tempUser.Street,
             username: $scope.tempUser.Username,
-            password: $scope.tempUser.Password
+            password: $scope.tempUser.Password || ""
         };
 
-        BSRMSService.RegisterUser(userData, $scope.tempUser.Gender, $scope.tempUser.Purok).then(function (response) {
-            if (response.data.success) {
-                // After adding, approve them automatically (admin adds are always verified)
-                BSRMSService.GetAllUsers().then(function (r) {
-                    var addedUser = r.data.data.filter(function(u) { return u.Username === userData.username; })[0];
-                    if (addedUser) {
-                        BSRMSService.ApproveUser(addedUser.usersID).then(function () {
-                            Swal.fire("Added", "Resident added and verified.", "success");
-                            $scope.loadAllUsers();
-                            $scope.showUserForm = false;
-                        });
-                    }
-                });
-            } else {
-                Swal.fire("Error", response.data.message, "error");
+        if ($scope.userEditMode) {
+            // EDIT MODE: Gamitin ang dedicated UpdateUser endpoint — hindi RegisterUser.
+            BSRMSService.UpdateUser(userData, $scope.tempUser.Gender, $scope.tempUser.Purok).then(function (response) {
+                if (response.data.success) {
+                    Swal.fire("Updated", "Resident data updated successfully.", "success");
+                    $scope.loadAllUsers();
+                    $scope.showUserForm = false;
+                } else {
+                    Swal.fire("Error", response.data.message, "error");
+                }
+            }).catch(function () {
+                Swal.fire("Server Error", "Could not connect to database.", "error");
+            });
+        } else {
+            // ADD MODE: I-check password strength bago mag-register ng bago.
+            if (!$scope.isPasswordStrong($scope.tempUser.Password)) {
+                Swal.fire("Weak Password", "Password must be at least 8 characters, 1 uppercase, 1 lowercase, and 1 special character.", "warning");
+                return;
             }
-        });
+            BSRMSService.RegisterUser(userData, $scope.tempUser.Gender, $scope.tempUser.Purok).then(function (response) {
+                if (response.data.success) {
+                    // Awtomatikong i-approve ang resident na dinagdag ng admin.
+                    BSRMSService.GetAllUsers().then(function (r) {
+                        var addedUser = r.data.data.filter(function(u) { return u.Username === userData.username; })[0];
+                        if (addedUser) {
+                            BSRMSService.ApproveUser(addedUser.usersID).then(function () {
+                                Swal.fire("Added", "Resident added and verified.", "success");
+                                $scope.loadAllUsers();
+                                $scope.showUserForm = false;
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire("Error", response.data.message, "error");
+                }
+            }).catch(function () {
+                Swal.fire("Server Error", "Could not connect to database.", "error");
+            });
+        }
     };
+
 
     // ================================================================
     // ADMIN REQUESTS - Dito tayo kukuha at mag-mamanage ng mga service requests.
@@ -588,8 +608,5 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             Swal.fire("Server Error", "Could not connect to database.", "error");
         });
     };
-
-    // Redundant function kept for compatibility
-    $scope.UpsertFunc = function () {};
 
 });

@@ -20,9 +20,11 @@
     </aside>
 
     <main class="flex-1 flex flex-col relative animate-slide-up overflow-y-auto z-10">
-        <header class="h-24 bg-white/60 backdrop-blur-2xl border-b border-white sticky top-0 z-30 flex items-center justify-between px-10 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
-            <div><h1 class="text-2xl font-black text-slate-900 tracking-tight">Request Board</h1></div>
-            <button ng-click="openAddReqForm()" ng-hide="showReqForm" class="flex items-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 text-sm font-black rounded-2xl px-6 py-3 transition-all shadow-lg shadow-indigo-500/20 active:scale-95 tracking-wide"><i class="material-icons mr-2 text-[20px]">add_task</i> Log Manual Entry</button>
+        <header class="h-32 bg-white/70 backdrop-blur-3xl border-b border-slate-200/60 sticky top-0 z-30 flex items-center justify-between px-12 shadow-sm transition-all">
+            <div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-900 to-slate-800 tracking-tight">Request Board</h1>
+                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-2">Manage Resident Service Tickets</p>
+            </div>
         </header>
 
         <div class="p-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
