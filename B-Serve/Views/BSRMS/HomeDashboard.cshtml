@@ -117,12 +117,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="cat in getCategoryBreakdown() track by $index" style="border-bottom: 1px solid #f1f5f9;">
+                    <tr ng-repeat="cat in categoryBreakdown track by $index" style="border-bottom: 1px solid #f1f5f9;">
                         <td style="padding: 7px 10px; font-weight: 700; color: #334155;">{{ cat.type }}</td>
                         <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #6366f1;">{{ cat.count }}</td>
                         <td style="padding: 7px 10px; text-align: center; font-weight: 700; color: #64748b;">{{ getPct(cat.count) }}</td>
                     </tr>
-                    <tr ng-show="getCategoryBreakdown().length === 0">
+                    <tr ng-show="categoryBreakdown.length === 0">
                         <td colspan="3" style="padding: 14px; text-align: center; color: #94a3b8; font-size: 11px;">No data available.</td>
                     </tr>
                 </tbody>
@@ -141,7 +141,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in getMonthlyBreakdown() track by $index" style="border-bottom: 1px solid #f1f5f9;">
+                    <tr ng-repeat="item in monthlyBreakdown track by $index" style="border-bottom: 1px solid #f1f5f9;">
                         <td style="padding: 7px 10px; font-weight: 700; color: #334155;">{{ item.month }}</td>
                         <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #6366f1;">{{ item.reqCount }}</td>
                         <td style="padding: 7px 10px; text-align: center; font-weight: 900; color: #10b981;">{{ item.userCount }}</td>

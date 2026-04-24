@@ -114,6 +114,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         BSRMSService.GetAllUsers().then(function (response) {
             if (response.data.success) {
                 $scope.userArray = response.data.data;
+                $scope.updateBreakdowns(); // Pre-calculate for the report
                 // I-redraw yung charts ONLY kung nasa Dashboard page tayo.
                 if (currentPage.indexOf('HomeDashboard') !== -1) {
                     setTimeout($scope.drawCharts, 100);
@@ -133,6 +134,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             } else {
                 Swal.fire("Error", response.data.message, "error");
             }
+        }).catch(function (error) {
+            console.error("Verification failed:", error);
         });
     };
 
@@ -145,6 +148,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             } else {
                 Swal.fire("Error", response.data.message, "error");
             }
+        }).catch(function (error) {
+            console.error("Rejection failed:", error);
         });
     };
 
@@ -157,6 +162,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             } else {
                 Swal.fire("Error", response.data.message, "error");
             }
+        }).catch(function (error) {
+            console.error("Deletion failed:", error);
         });
     };
 
@@ -214,42 +221,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     };
 
     // Helper: group requests by category — used in print report
-    $scope.getCategoryBreakdown = function () {
-        var counts = {};
-        for (var i = 0; i < $scope.requestArray.length; i++) {
-            var type = $scope.requestArray[i].Type || 'Other';
-            counts[type] = (counts[type] || 0) + 1;
-        }
-        var result = [];
-        var keys = Object.keys(counts);
-        for (var j = 0; j < keys.length; j++) {
-            result.push({ type: keys[j], count: counts[keys[j]] });
-        }
-        return result;
-    };
+    // Breakdown functions removed - now using pre-calculated variables to avoid infinite digest loops.
 
-    // Helper: monthly request + user registration counts for current year
-    $scope.getMonthlyBreakdown = function () {
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var reqCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var userCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var yr = new Date().getFullYear().toString();
-        for (var i = 0; i < $scope.requestArray.length; i++) {
-            if (!$scope.requestArray[i].CreatedAt) continue;
-            var p = $scope.requestArray[i].CreatedAt.split('-');
-            if (p[0] === yr) reqCounts[parseInt(p[1]) - 1]++;
-        }
-        for (var j = 0; j < $scope.userArray.length; j++) {
-            if (!$scope.userArray[j].CreatedAt) continue;
-            var q = $scope.userArray[j].CreatedAt.split('-');
-            if (q[0] === yr) userCounts[parseInt(q[1]) - 1]++;
-        }
-        var result = [];
-        for (var k = 0; k < months.length; k++) {
-            result.push({ month: months[k], reqCount: reqCounts[k], userCount: userCounts[k] });
-        }
-        return result;
-    };
 
     // ================================================================
     // ADMIN USERS - Dito si admin pwedeng mag-add manually ng resident.
@@ -290,17 +263,16 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         };
 
         if ($scope.userEditMode) {
-            // EDIT MODE: Gamitin ang dedicated UpdateUser endpoint — hindi RegisterUser.
             BSRMSService.UpdateUser(userData, $scope.tempUser.Gender, $scope.tempUser.Purok).then(function (response) {
                 if (response.data.success) {
-                    Swal.fire("Updated", "Resident data updated successfully.", "success");
+                    Swal.fire("Updated", "Resident record updated.", "success");
                     $scope.loadAllUsers();
                     $scope.showUserForm = false;
                 } else {
                     Swal.fire("Error", response.data.message, "error");
                 }
-            }).catch(function () {
-                Swal.fire("Server Error", "Could not connect to database.", "error");
+            }).catch(function (error) {
+                console.error("Update failed:", error);
             });
         } else {
             // ADD MODE: I-check password strength bago mag-register ng bago.
@@ -359,6 +331,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         BSRMSService.GetAllRequests().then(function (response) {
             if (response.data.success) {
                 $scope.requestArray = response.data.data;
+                $scope.updateBreakdowns(); // Pre-calculate for the report
                 // I-redraw yung charts ONLY kung nasa Dashboard page tayo.
                 if (currentPage.indexOf('HomeDashboard') !== -1) {
                     setTimeout($scope.drawCharts, 100);
@@ -369,8 +342,47 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         });
     };
 
+    $scope.categoryBreakdown = [];
+    $scope.monthlyBreakdown = [];
+
+    $scope.updateBreakdowns = function () {
+        // 1. Category Breakdown
+        var counts = {};
+        for (var i = 0; i < $scope.requestArray.length; i++) {
+            var type = $scope.requestArray[i].Type || 'Other';
+            counts[type] = (counts[type] || 0) + 1;
+        }
+        var catRes = [];
+        var keys = Object.keys(counts);
+        for (var j = 0; j < keys.length; j++) {
+            catRes.push({ type: keys[j], count: counts[keys[j]] });
+        }
+        $scope.categoryBreakdown = catRes;
+
+        // 2. Monthly Breakdown
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var currentYear = new Date().getFullYear().toString();
+        var res = [];
+        for (var m = 0; m < months.length; m++) {
+            var rCount = 0;
+            for (var k = 0; k < $scope.requestArray.length; k++) {
+                if (!$scope.requestArray[k].CreatedAt) continue;
+                if ($scope.requestArray[k].CreatedAt.split('-')[0] === currentYear && parseInt($scope.requestArray[k].CreatedAt.split('-')[1]) === (m + 1)) rCount++;
+            }
+            var uCount = 0;
+            for (var l = 0; l < $scope.userArray.length; l++) {
+                if (!$scope.userArray[l].CreatedAt) continue;
+                if ($scope.userArray[l].CreatedAt.split('-')[0] === currentYear && parseInt($scope.userArray[l].CreatedAt.split('-')[1]) === (m + 1)) uCount++;
+            }
+            res.push({ month: months[m], reqCount: rCount, userCount: uCount });
+        }
+        $scope.monthlyBreakdown = res;
+    };
+
     // Draw all 4 dashboard charts using live data
     $scope.drawCharts = function () {
+        if (typeof Chart === 'undefined') return;
+
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var currentYear = new Date().getFullYear().toString();
 
@@ -554,6 +566,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             } else {
                 Swal.fire("Error", response.data.message, "error");
             }
+        }).catch(function (error) {
+            console.error("Update failed:", error);
         });
     };
 
