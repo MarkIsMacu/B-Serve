@@ -7,13 +7,7 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     $scope.goTo = function (pageName) {
         var baseUrl = window.appBaseUrl || "/";
         if (!baseUrl.endsWith("/")) baseUrl += "/";
-        var url = baseUrl + "BSRMS/" + pageName;
-        // Gamitin ang smooth transition system para walang white flash.
-        if (window.BServeNav) {
-            window.BServeNav.go(url);
-        } else {
-            window.location.href = url;
-        }
+        window.location.href = baseUrl + "BSRMS/" + pageName;
     };
 
     // ================================================================

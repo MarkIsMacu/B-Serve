@@ -13,59 +13,71 @@
 
         /* --- GLOBAL SMOOTHNESS STYLES --- */
 
-        /* Fade-in ng buong body kapag nag-load ang page. */
+        /* Smooth fade-in animation para sa buong page pagka-navigate. */
         body {
-            animation: pageFadeIn 0.2s ease-out both;
+            animation: pageFadeIn 0.25s ease-out;
         }
         @@keyframes pageFadeIn {
-            from { opacity: 0; transform: translateY(4px); }
+            from { opacity: 0; transform: translateY(6px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ------------------------------------------------------------------ */
-        /* PAGE TRANSITION OVERLAY                                             */
-        /* Ito ang nagtatakip ng page bago lumipat para walang white flash.    */
-        /* ------------------------------------------------------------------ */
-        #bserve-page-overlay {
-            position: fixed;
-            inset: 0;
-            background: #f8fafc;
-            z-index: 99999;
-            opacity: 1; /* Start fully opaque to hide loading flashes */
-            pointer-events: all;
-            transition: opacity 0.25s ease;
+        /* Slide-up animation — ginagamit sa mga card at form panels. */
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out;
         }
-        /* Kapag nag-load na ang page, itatago na ang overlay */
-        #bserve-page-overlay.loaded {
-            opacity: 0;
-            pointer-events: none;
-        }
-        /* Kapag paalis na ang page (navigating away), ibabalik ang overlay */
-        #bserve-page-overlay.navigating {
-            opacity: 1;
-            pointer-events: all;
+        @@keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Top progress bar — lumalabas habang nag-loload ang bagong page. */
-        #bserve-progress-bar {
+        /* Smooth transitions para sa lahat ng buttons — para ma-feel ang click. */
+        button, a {
+            transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+
+        /* Smooth transitions para sa lahat ng input boxes. */
+        input, select, textarea {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        /* Smooth transitions para sa lahat ng table rows. */
+        tr {
+            transition: background-color 0.15s ease;
+        }
+
+        /* Custom scrollbar — payat at maayos ang hitsura. */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Loading spinner na lumalabas habang kukukuhin ang data sa database. */
+        .bserve-loading-bar {
             position: fixed;
             top: 0; left: 0;
             height: 3px;
             width: 0%;
             background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
-            z-index: 100000;
+            z-index: 9999;
+            transition: width 0.3s ease;
             border-radius: 0 99px 99px 0;
-            transition: width 0.4s ease, opacity 0.3s ease;
-            opacity: 0;
         }
-        #bserve-progress-bar.running {
-            opacity: 1;
-            width: 80%;
+        .bserve-loading-bar.active {
+            width: 85%;
+            animation: loadingPulse 1.2s ease-in-out infinite alternate;
         }
-        #bserve-progress-bar.done {
+        .bserve-loading-bar.done {
             width: 100%;
             opacity: 0;
-            transition: width 0.15s ease, opacity 0.3s ease 0.1s;
+            transition: width 0.2s ease, opacity 0.3s ease 0.2s;
+        }
+        @@keyframes loadingPulse {
+            from { opacity: 1; }
+            to   { opacity: 0.6; }
         }
 
         /* Slide-up animation — ginagamit sa mga card at form panels. */
@@ -110,9 +122,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
-        // I-store ang base URL para walang 404 errors sa routing ng IIS Express.
+        // Store the base URL to prevent 404 routing errors in Visual Studio's IIS Express
         window.appBaseUrl = '@Url.Content("~")';
-
+        
         tailwind.config = {
             theme: {
                 extend: {
@@ -124,54 +136,43 @@
             }
         };
 
-        // ----------------------------------------------------------------
-        // PAGE TRANSITION SYSTEM
-        // Ito ang nagpapadali ng smooth navigation sa pagitan ng mga pages.
-        // ----------------------------------------------------------------
-        window.BServeNav = {
-            // I-navigate sa bagong page na may fade-out transition bago lumipat.
-            go: function (url) {
-                var overlay = document.getElementById('bserve-page-overlay');
-                var bar     = document.getElementById('bserve-progress-bar');
-
-                // Ipakita ang progress bar
-                if (bar) bar.className = 'running';
-
-                // I-fade out ang current page gamit ang overlay
-                if (overlay) {
-                    overlay.classList.remove('loaded');
-                    overlay.classList.add('navigating');
-                    // Mag-navigate pagkatapos ng fade (200ms)
-                    setTimeout(function () {
-                        window.location.href = url;
-                    }, 200);
-                } else {
-                    // Fallback kung hindi pa naka-render ang overlay
-                    window.location.href = url;
+        // Loading bar functions — tinatawag bago at pagkatapos ng page navigation.
+        window.BServeLoader = {
+            bar: null,
+            show: function () {
+                if (!this.bar) {
+                    this.bar = document.createElement('div');
+                    this.bar.className = 'bserve-loading-bar';
+                    document.body.appendChild(this.bar);
+                }
+                this.bar.className = 'bserve-loading-bar active';
+            },
+            hide: function () {
+                if (this.bar) {
+                    this.bar.className = 'bserve-loading-bar done';
                 }
             }
         };
 
-        // Kapag nag-load na ang bagong page — i-fade in at itago ang overlay.
+        // Ipakita ang loading bar bago lumipat ng page para ma-feel ng user na may nangyayari.
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest('a[ng-click], button[ng-click]');
+            if (link) {
+                var action = link.getAttribute('ng-click') || '';
+                if (action.indexOf('goTo(') !== -1) {
+                    window.BServeLoader.show();
+                }
+            }
+        }, true);
+
+        // Itago ang loading bar pagkatapos mag-load ng page.
         window.addEventListener('load', function () {
-            var bar = document.getElementById('bserve-progress-bar');
-            if (bar) bar.className = 'done';
-            
-            // Bigyan ng konting delay bago tanggalin ang overlay para maka-render muna si Angular
-            setTimeout(function() {
-                var overlay = document.getElementById('bserve-page-overlay');
-                if (overlay) overlay.classList.add('loaded');
-            }, 50);
+            setTimeout(function () { window.BServeLoader.hide(); }, 200);
         });
     </script>
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans antialiased" ng-app="BSRMSApp" ng-controller="BSRMSController" ng-cloak>
-
-    <!-- Page transition overlay — nagtatakip ng white flash sa pagitan ng mga page loads -->
-    <div id="bserve-page-overlay"></div>
-    <!-- Top progress bar — nagpapakita ng loading progress -->
-    <div id="bserve-progress-bar"></div>
 
     <div>
         @RenderBody()
