@@ -107,18 +107,20 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     // ================================================================
     $scope.userArray = [];
 
+    // currentPage - ginagamit natin para malaman kung anong page tayo ngayon.
+    var currentPage = window.location.pathname;
+
     $scope.loadAllUsers = function () {
         BSRMSService.GetAllUsers().then(function (response) {
             if (response.data.success) {
                 $scope.userArray = response.data.data;
-                // Redraw charts once user data is also available
-                setTimeout($scope.drawCharts, 100);
+                // I-redraw yung charts ONLY kung nasa Dashboard page tayo.
+                if (currentPage.indexOf('HomeDashboard') !== -1) {
+                    setTimeout($scope.drawCharts, 100);
+                }
             }
         });
     };
-
-    // Tatawagin natin ito para automatic mag-load yung users pagkabukas ng page.
-    $scope.loadAllUsers();
 
     // Approve a resident
     $scope.verifyUser = function (user) {
@@ -355,8 +357,10 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         BSRMSService.GetAllRequests().then(function (response) {
             if (response.data.success) {
                 $scope.requestArray = response.data.data;
-                // Wait for AngularJS to finish rendering, then draw the charts
-                setTimeout($scope.drawCharts, 100);
+                // I-redraw yung charts ONLY kung nasa Dashboard page tayo.
+                if (currentPage.indexOf('HomeDashboard') !== -1) {
+                    setTimeout($scope.drawCharts, 100);
+                }
             }
         });
     };
@@ -520,9 +524,6 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         }
     };
 
-    // Load automatically for admin requests page
-    $scope.loadAllRequests();
-
     $scope.showReqForm = false;
     $scope.reqEditMode = false;
     $scope.tempReq = {};
@@ -608,5 +609,25 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
             Swal.fire("Server Error", "Could not connect to database.", "error");
         });
     };
+
+    // ================================================================
+    // PAGE-AWARE LOADING - Load lang ang data na kailangan ng current page.
+    // Ito ang nagpapabilis ng navigation — hindi na nag-lo-load ng extra data.
+    // ================================================================
+    if (currentPage.indexOf('HomeDashboard') !== -1) {
+        // Dashboard: kailangan lahat — users, requests, at charts.
+        $scope.loadAllUsers();
+        $scope.loadAllRequests();
+    } else if (currentPage.indexOf('AdminApproval') !== -1 ||
+               currentPage.indexOf('AdminUsers') !== -1) {
+        // Approval at Directory pages: users lang ang kailangan.
+        $scope.loadAllUsers();
+    } else if (currentPage.indexOf('AdminRequest') !== -1) {
+        // Request Board: requests lang ang kailangan.
+        $scope.loadAllRequests();
+    } else if (currentPage.indexOf('ResidentDashboard') !== -1) {
+        // Resident page: personal requests niya lang ang kailangan.
+        $scope.loadMyRequests();
+    }
 
 });

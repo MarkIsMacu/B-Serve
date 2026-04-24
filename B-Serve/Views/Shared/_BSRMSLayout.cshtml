@@ -6,13 +6,82 @@
     <title>B-Serve | Barangay System</title>
 
     <style>
+        /* Itago ang AngularJS template para hindi mag-flash ng raw {{}} text bago mag-load. */
         [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
             display: none !important;
+        }
+
+        /* --- GLOBAL SMOOTHNESS STYLES --- */
+
+        /* Smooth fade-in animation para sa buong page pagka-navigate. */
+        body {
+            animation: pageFadeIn 0.25s ease-out;
+        }
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide-up animation — ginagamit sa mga card at form panels. */
+        .animate-slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Smooth transitions para sa lahat ng buttons — para ma-feel ang click. */
+        button, a {
+            transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+
+        /* Smooth transitions para sa lahat ng input boxes. */
+        input, select, textarea {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        /* Smooth transitions para sa lahat ng table rows. */
+        tr {
+            transition: background-color 0.15s ease;
+        }
+
+        /* Custom scrollbar — payat at maayos ang hitsura. */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Loading spinner na lumalabas habang kukukuhin ang data sa database. */
+        .bserve-loading-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
+            z-index: 9999;
+            transition: width 0.3s ease;
+            border-radius: 0 99px 99px 0;
+        }
+        .bserve-loading-bar.active {
+            width: 85%;
+            animation: loadingPulse 1.2s ease-in-out infinite alternate;
+        }
+        .bserve-loading-bar.done {
+            width: 100%;
+            opacity: 0;
+            transition: width 0.2s ease, opacity 0.3s ease 0.2s;
+        }
+        @keyframes loadingPulse {
+            from { opacity: 1; }
+            to   { opacity: 0.6; }
         }
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
@@ -32,7 +101,41 @@
                     }
                 }
             }
-        }
+        };
+
+        // Loading bar functions — tinatawag bago at pagkatapos ng page navigation.
+        window.BServeLoader = {
+            bar: null,
+            show: function () {
+                if (!this.bar) {
+                    this.bar = document.createElement('div');
+                    this.bar.className = 'bserve-loading-bar';
+                    document.body.appendChild(this.bar);
+                }
+                this.bar.className = 'bserve-loading-bar active';
+            },
+            hide: function () {
+                if (this.bar) {
+                    this.bar.className = 'bserve-loading-bar done';
+                }
+            }
+        };
+
+        // Ipakita ang loading bar bago lumipat ng page para ma-feel ng user na may nangyayari.
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest('a[ng-click], button[ng-click]');
+            if (link) {
+                var action = link.getAttribute('ng-click') || '';
+                if (action.indexOf('goTo(') !== -1) {
+                    window.BServeLoader.show();
+                }
+            }
+        }, true);
+
+        // Itago ang loading bar pagkatapos mag-load ng page.
+        window.addEventListener('load', function () {
+            setTimeout(function () { window.BServeLoader.hide(); }, 200);
+        });
     </script>
 </head>
 
@@ -48,4 +151,4 @@
     <script src="~/Scripts/HolyScripts/Service.js"></script>
     <script src="~/Scripts/HolyScripts/Controller.js"></script>
 </body>
-</html>
+</html>
