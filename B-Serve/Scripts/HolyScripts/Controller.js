@@ -235,14 +235,12 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.showUserForm = true;
         $scope.userEditMode = false;
         $scope.tempUser = {};
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.triggerEditUser = function (user) {
         $scope.showUserForm = true;
         $scope.userEditMode = true;
         $scope.tempUser = angular.copy(user);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // Admin adding a new resident manually (uses the same registration endpoint)
@@ -581,7 +579,6 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.showReqForm = true;
         $scope.reqEditMode = false;
         $scope.tempReq = { Status: "Pending", AdminFeedback: "" };
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.triggerEditRequest = function (req) {
@@ -589,7 +586,6 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.showReqForm = true;
         $scope.reqEditMode = true;
         $scope.tempReq = angular.copy(req);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.adminSaveRequest = function () {

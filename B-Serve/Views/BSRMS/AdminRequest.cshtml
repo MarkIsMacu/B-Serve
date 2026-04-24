@@ -29,60 +29,68 @@
 
         <div class="p-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
 
-            <div ng-show="showReqForm" class="bg-white/70 backdrop-blur-2xl rounded-[2.5rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.08)] p-10 mb-8 relative overflow-hidden animate-slide-up">
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500"></div>
-                <h3 class="text-2xl font-black text-slate-900 mb-8 flex items-center border-b border-slate-200/60 pb-6"><div class="p-2 bg-indigo-50 rounded-xl mr-4 border border-indigo-100 shadow-sm"><i class="material-icons text-indigo-600 block">edit_document</i></div> {{ reqEditMode ? 'Update Service Ticket' : 'Create Internal Ticket' }}</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-                    <!-- Category: editable when creating, read-only when updating -->
-                    <div ng-hide="reqEditMode">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-rose-500">*</span></label>
-                        <select ng-model="tempReq.Type" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
-                            <option value="" disabled selected>Select</option>
-                            <option value="Barangay Clearance">Barangay Clearance</option>
-                            <option value="Certificate of Indigency">Certificate of Indigency</option>
-                            <option value="Business Permit">Business Permit</option>
-                            <option value="General Complaint">General Complaint</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div ng-show="reqEditMode">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
-                        <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500">{{tempReq.Type}}</div>
+            <!-- Centered Modal for Update Ticket -->
+            <div ng-show="showReqForm" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div class="bg-white rounded-[2.5rem] border border-white shadow-[0_20px_70px_rgb(0,0,0,0.25)] p-10 max-w-4xl w-full relative overflow-hidden animate-zoom-in max-h-[90vh] overflow-y-auto">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500"></div>
+                    
+                    <div class="flex justify-between items-center mb-8 border-b border-slate-100 pb-6">
+                        <h3 class="text-2xl font-black text-slate-900 flex items-center">
+                            <div class="p-2 bg-indigo-50 rounded-xl mr-4 border border-indigo-100 shadow-sm"><i class="material-icons text-indigo-600 block">edit_document</i></div> 
+                            {{ reqEditMode ? 'Update Service Ticket' : 'Create Internal Ticket' }}
+                        </h3>
+                        <button ng-click="showReqForm = false" class="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all"><i class="material-icons">close</i></button>
                     </div>
 
-                    <!-- Status: always editable -->
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Assign Status <span class="text-rose-500">*</span></label>
-                        <select ng-model="tempReq.Status" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
-                            <option value="Pending">Pending (Review)</option>
-                            <option value="On-going">On-going (Processing)</option>
-                            <option value="Resolved">Resolved (Complete)</option>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Category -->
+                        <div ng-hide="reqEditMode">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-rose-500">*</span></label>
+                            <select ng-model="tempReq.Type" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
+                                <option value="" disabled selected>Select</option>
+                                <option value="Barangay Clearance">Barangay Clearance</option>
+                                <option value="Certificate of Indigency">Certificate of Indigency</option>
+                                <option value="Business Permit">Business Permit</option>
+                                <option value="General Complaint">General Complaint</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div ng-show="reqEditMode">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Category Type <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
+                            <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500">{{tempReq.Type}}</div>
+                        </div>
+
+                        <!-- Status -->
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Assign Status <span class="text-rose-500">*</span></label>
+                            <select ng-model="tempReq.Status" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold appearance-none shadow-sm">
+                                <option value="Pending">Pending (Review)</option>
+                                <option value="On-going">On-going (Processing)</option>
+                                <option value="Resolved">Resolved (Complete)</option>
+                            </select>
+                        </div>
+
+                        <!-- Original Message -->
+                        <div class="md:col-span-1" ng-hide="reqEditMode">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-rose-500">*</span></label>
+                            <textarea ng-model="tempReq.Message" maxlength="500" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none shadow-sm"></textarea>
+                        </div>
+                        <div class="md:col-span-1" ng-show="reqEditMode">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
+                            <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500 min-h-[120px]">{{tempReq.Message}}</div>
+                        </div>
+
+                        <!-- Admin Note -->
+                        <div class="md:col-span-1">
+                            <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2 pl-1"><i class="material-icons text-[12px] align-baseline mr-1">chat</i> Admin Note to Resident</label>
+                            <textarea ng-model="tempReq.AdminFeedback" maxlength="500" placeholder="Reply to the resident directly..." class="w-full px-5 py-4 rounded-2xl bg-indigo-50/30 border-2 border-indigo-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none placeholder-slate-400 shadow-sm"></textarea>
+                        </div>
                     </div>
 
-                    <!-- Original Message: editable when creating, read-only when updating -->
-                    <div class="md:col-span-1" ng-hide="reqEditMode">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-rose-500">*</span></label>
-                        <textarea ng-model="tempReq.Message" maxlength="500" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none shadow-sm"></textarea>
+                    <div class="flex gap-4 border-t border-slate-100 pt-8">
+                        <button ng-click="adminSaveRequest()" class="flex-1 px-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-indigo-600 text-xs transition-all active:scale-95 border border-slate-800">Save Update</button>
+                        <button ng-click="showReqForm = false" class="px-8 py-4 bg-white text-slate-500 border-2 border-slate-100 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-50 hover:text-slate-700 text-xs transition-all active:scale-95 shadow-sm">Cancel</button>
                     </div>
-                    <div class="md:col-span-1" ng-show="reqEditMode">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Original Request <span class="text-[9px] text-slate-400 normal-case font-bold">(locked)</span></label>
-                        <div class="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-sm font-bold text-slate-500 min-h-[120px]">{{tempReq.Message}}</div>
-                    </div>
-
-                    <!-- Admin Note: always editable -->
-                    <div class="md:col-span-1">
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2 pl-1"><i class="material-icons text-[12px] align-baseline mr-1">chat</i> Admin Note to Resident</label>
-                        <textarea ng-model="tempReq.AdminFeedback" maxlength="500" placeholder="Reply to the resident directly..." class="w-full px-5 py-4 rounded-2xl bg-indigo-50/30 border-2 border-indigo-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none text-sm transition-all font-bold min-h-[120px] resize-none placeholder-slate-400 shadow-sm"></textarea>
-                    </div>
-
-                </div>
-
-                <div class="flex gap-4">
-                    <button ng-click="adminSaveRequest()" class="px-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-indigo-600 text-xs transition-all active:scale-95 border border-slate-800">Save Update</button>
-                    <button ng-click="showReqForm = false" class="px-8 py-4 bg-white text-slate-500 border-2 border-slate-100 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-50 hover:text-slate-700 text-xs transition-all active:scale-95 shadow-sm">Cancel</button>
                 </div>
             </div>
 

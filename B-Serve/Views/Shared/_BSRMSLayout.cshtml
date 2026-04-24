@@ -80,21 +80,21 @@
             to   { opacity: 0.6; }
         }
 
-        /* Slide-up animation — ginagamit sa mga card at form panels. */
-        .animate-slide-up {
-            animation: slideUp 0.3s ease-out both;
+        /* Modal Animations */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out both;
         }
-        @@keyframes slideUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
 
-        /* Smooth transitions para sa lahat ng buttons at links. */
-        button, a {
-            transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        .animate-zoom-in {
+            animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
-        button:active {
-            transform: scale(0.97);
+        @@keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         /* Smooth transitions para sa lahat ng input boxes. */
