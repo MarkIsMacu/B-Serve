@@ -119,6 +119,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
                     setTimeout($scope.drawCharts, 100);
                 }
             }
+        }).catch(function (error) {
+            console.error("Failed to load users", error);
         });
     };
 
@@ -161,104 +163,6 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     // ================================================================
     // ADMIN DASHBOARD - Para makapag-bilang tayo ng stats sa dashboard.
     // ================================================================
-    var charts = {}; // Para ma-store at ma-destroy yung lumang charts bago mag-redraw.
-
-    $scope.drawCharts = function () {
-        if (typeof Chart === 'undefined') return;
-
-        // 1. Status Chart (Donut)
-        var ctxStatus = document.getElementById('statusChart');
-        if (ctxStatus) {
-            if (charts.status) charts.status.destroy();
-            var p = $scope.countRequests('Pending');
-            var o = $scope.countRequests('On-going');
-            var r = $scope.countRequests('Resolved');
-            var total = p + o + r;
-            
-            charts.status = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pending', 'On-going', 'Resolved'],
-                    datasets: [{
-                        data: total === 0 ? [1] : [p, o, r], // Default grey kung walang data
-                        backgroundColor: total === 0 ? ['#e2e8f0'] : ['#fbbf24', '#6366f1', '#10b981'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
-            });
-        }
-
-        // 2. Category Chart (Bar)
-        var ctxCat = document.getElementById('categoryChart');
-        if (ctxCat) {
-            if (charts.cat) charts.cat.destroy();
-            var bd = $scope.getCategoryBreakdown ? $scope.getCategoryBreakdown() : [];
-            var lbls = bd.map(function(x) { return x.type; });
-            var dts = bd.map(function(x) { return x.count; });
-            
-            charts.cat = new Chart(ctxCat, {
-                type: 'bar',
-                data: {
-                    labels: lbls.length > 0 ? lbls : ['No Data'],
-                    datasets: [{
-                        data: dts.length > 0 ? dts : [0],
-                        backgroundColor: '#818cf8',
-                        borderRadius: 4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-            });
-        }
-
-        // 3. User Trend Chart (Line)
-        var ctxUser = document.getElementById('userTrendChart');
-        if (ctxUser) {
-            if (charts.user) charts.user.destroy();
-            var md = $scope.getMonthlyBreakdown ? $scope.getMonthlyBreakdown() : [];
-            var mlbls = md.map(function(x) { return x.month; });
-            var mudts = md.map(function(x) { return x.userCount; });
-            
-            charts.user = new Chart(ctxUser, {
-                type: 'line',
-                data: {
-                    labels: mlbls.length > 0 ? mlbls : ['Jan'],
-                    datasets: [{
-                        data: mudts.length > 0 ? mudts : [0],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-            });
-        }
-
-        // 4. Request Trend Chart (Line)
-        var ctxReq = document.getElementById('requestTrendChart');
-        if (ctxReq) {
-            if (charts.req) charts.req.destroy();
-            var md2 = $scope.getMonthlyBreakdown ? $scope.getMonthlyBreakdown() : [];
-            var mlbls2 = md2.map(function(x) { return x.month; });
-            var mrdts = md2.map(function(x) { return x.reqCount; });
-            
-            charts.req = new Chart(ctxReq, {
-                type: 'line',
-                data: {
-                    labels: mlbls2.length > 0 ? mlbls2 : ['Jan'],
-                    datasets: [{
-                        data: mrdts.length > 0 ? mrdts : [0],
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-            });
-        }
-    };
     $scope.getTotalVerifiedResidents = function () {
         var count = 0;
         for (var i = 0; i < $scope.userArray.length; i++) {
@@ -460,6 +364,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
                     setTimeout($scope.drawCharts, 100);
                 }
             }
+        }).catch(function (error) {
+            console.error("Failed to load requests", error);
         });
     };
 
@@ -538,13 +444,14 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         var statusCanvas = document.getElementById('statusChart');
         if (statusCanvas) {
             if (statusChartInstance) statusChartInstance.destroy();
+            var totalRequests = pending + ongoing + resolved;
             statusChartInstance = new Chart(statusCanvas, {
                 type: 'doughnut',
                 data: {
                     labels: ['Pending', 'On-going', 'Resolved'],
                     datasets: [{
-                        data: [pending, ongoing, resolved],
-                        backgroundColor: ['#fbbf24', '#6366f1', '#10b981'],
+                        data: totalRequests === 0 ? [1] : [pending, ongoing, resolved],
+                        backgroundColor: totalRequests === 0 ? ['#e2e8f0'] : ['#fbbf24', '#6366f1', '#10b981'],
                         borderWidth: 0,
                         hoverOffset: 8
                     }]
