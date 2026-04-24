@@ -235,12 +235,14 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.showUserForm = true;
         $scope.userEditMode = false;
         $scope.tempUser = {};
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.triggerEditUser = function (user) {
         $scope.showUserForm = true;
         $scope.userEditMode = true;
         $scope.tempUser = angular.copy(user);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // Admin adding a new resident manually (uses the same registration endpoint)
@@ -346,6 +348,8 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
     $scope.monthlyBreakdown = [];
 
     $scope.updateBreakdowns = function () {
+        if (!$scope.requestArray) return;
+        
         // 1. Category Breakdown
         var counts = {};
         for (var i = 0; i < $scope.requestArray.length; i++) {
@@ -359,22 +363,50 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         }
         $scope.categoryBreakdown = catRes;
 
-        // 2. Monthly Breakdown
+        // 2. Monthly Breakdown (Single Pass Optimization)
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var currentYear = new Date().getFullYear().toString();
-        var res = [];
-        for (var m = 0; m < months.length; m++) {
-            var rCount = 0;
-            for (var k = 0; k < $scope.requestArray.length; k++) {
-                if (!$scope.requestArray[k].CreatedAt) continue;
-                if ($scope.requestArray[k].CreatedAt.split('-')[0] === currentYear && parseInt($scope.requestArray[k].CreatedAt.split('-')[1]) === (m + 1)) rCount++;
+        var monthlyMap = {};
+        
+        // Initialize map
+        for (var m = 0; m < 12; m++) {
+            monthlyMap[m + 1] = { req: 0, user: 0 };
+        }
+
+        // Count requests
+        for (var k = 0; k < $scope.requestArray.length; k++) {
+            var r = $scope.requestArray[k];
+            if (r.CreatedAt && r.CreatedAt.indexOf('-') !== -1) {
+                var parts = r.CreatedAt.split('-');
+                if (parts[0] === currentYear) {
+                    var monthIdx = parseInt(parts[1]);
+                    if (monthlyMap[monthIdx]) monthlyMap[monthIdx].req++;
+                }
             }
-            var uCount = 0;
+        }
+
+        // Count users
+        if ($scope.userArray) {
             for (var l = 0; l < $scope.userArray.length; l++) {
-                if (!$scope.userArray[l].CreatedAt) continue;
-                if ($scope.userArray[l].CreatedAt.split('-')[0] === currentYear && parseInt($scope.userArray[l].CreatedAt.split('-')[1]) === (m + 1)) uCount++;
+                var u = $scope.userArray[l];
+                if (u.CreatedAt && u.CreatedAt.indexOf('-') !== -1) {
+                    var uparts = u.CreatedAt.split('-');
+                    if (uparts[0] === currentYear) {
+                        var umonthIdx = parseInt(uparts[1]);
+                        if (monthlyMap[umonthIdx]) monthlyMap[umonthIdx].user++;
+                    }
+                }
             }
-            res.push({ month: months[m], reqCount: rCount, userCount: uCount });
+        }
+
+        // Convert map to array
+        var res = [];
+        for (var n = 0; n < 12; n++) {
+            res.push({
+                month: months[n],
+                reqCount: monthlyMap[n + 1].req,
+                userCount: monthlyMap[n + 1].user
+            });
         }
         $scope.monthlyBreakdown = res;
     };
@@ -549,12 +581,15 @@ app.controller("BSRMSController", function ($scope, BSRMSService) {
         $scope.showReqForm = true;
         $scope.reqEditMode = false;
         $scope.tempReq = { Status: "Pending", AdminFeedback: "" };
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.triggerEditRequest = function (req) {
+        $scope.tempReq = {}; // Reset first
         $scope.showReqForm = true;
         $scope.reqEditMode = true;
         $scope.tempReq = angular.copy(req);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     $scope.adminSaveRequest = function () {
